@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>미리보기 · E본문 + B네비 · DeskList</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Noto+Sans+KR:wght@400;500;600;700&family=Outfit:wght@500;650;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --signal: oklch(45% 0.19 264);
+        --ink: oklch(16% 0.01 255);
+        --paper: oklch(99% 0.003 255);
+        --bp-navy: #1a2a3a;
+        --bp-cyan: #5ba4b5;
+        --bp-muted: #3d5163;
+        --max: 72rem;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-padding-top: 4rem; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: Archivo, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+        background: var(--paper);
+        background-image:
+          linear-gradient(rgba(20, 24, 40, 0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20, 24, 40, 0.06) 1px, transparent 1px);
+        background-size: calc(100% / 12) 4.5rem;
+        background-attachment: fixed;
+      }
+
+      /* —— B: Studio Blueprint nav (배경은 E 본문과 동일) —— */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        pointer-events: none;
+        background: transparent;
+        border-bottom: 1px solid var(--bp-cyan);
+      }
+      .site-header a,
+      .site-header button {
+        pointer-events: auto;
+      }
+      .site-header__inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0.85rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        font-family: Outfit, "Noto Sans KR", sans-serif;
+      }
+      .brand {
+        color: var(--bp-navy);
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .brand span { color: var(--bp-cyan); }
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.8rem;
+      }
+      .nav a {
+        color: var(--bp-muted);
+        text-decoration: none;
+        letter-spacing: 0.02em;
+      }
+      .nav a[aria-current="page"] {
+        color: var(--bp-navy);
+        font-weight: 650;
+        box-shadow: inset 0 -2px 0 var(--bp-cyan);
+      }
+
+      .banner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0.75rem 1.5rem 0;
+        font-size: 0.78rem;
+        color: oklch(40% 0.02 255);
+      }
+      .banner a { color: var(--ink); }
+      .banner strong { color: var(--signal); font-weight: 600; }
+
+      .main {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 1.25rem 1.5rem 3rem;
+      }
+
+      .cal-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 12.5rem;
+        gap: 1.5rem;
+        align-items: start;
+      }
+      @media (max-width: 900px) {
+        .cal-layout { grid-template-columns: 1fr; }
+      }
+
+      /* —— E: Grid Signal body —— */
+      .page-title {
+        font-weight: 800;
+        font-size: clamp(2rem, 5vw, 3rem);
+        letter-spacing: -0.045em;
+        line-height: 0.9;
+        text-transform: lowercase;
+        margin: 0 0 0.35rem;
+        max-width: 10ch;
+      }
+      .page-title::after {
+        content: "";
+        display: block;
+        width: 2.75rem;
+        height: 3px;
+        background: var(--signal);
+        margin-top: 0.45rem;
+      }
+      .page-sub {
+        margin: 0 0 1.25rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: oklch(42% 0.02 255);
+      }
+      .reg {
+        display: inline-block;
+        width: 0.55rem;
+        height: 0.55rem;
+        border: 1px solid var(--ink);
+        border-radius: 50%;
+        position: relative;
+        margin-left: 0.35rem;
+        vertical-align: middle;
+      }
+      .reg::before,
+      .reg::after {
+        content: "";
+        position: absolute;
+        background: var(--ink);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .reg::before { width: 1px; height: 100%; }
+      .reg::after { width: 100%; height: 1px; }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .ym {
+        font-weight: 800;
+        font-size: 0.95rem;
+        letter-spacing: -0.02em;
+      }
+      .seg {
+        display: inline-flex;
+        border: 1px solid rgba(20, 24, 40, 0.25);
+      }
+      .seg button {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        font: inherit;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.35rem 0.65rem;
+        cursor: pointer;
+        color: oklch(40% 0.02 255);
+      }
+      .seg button[aria-pressed="true"] {
+        background: var(--signal);
+        color: #fff;
+      }
+
+      .weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0;
+        margin-bottom: 0;
+      }
+      .weekdays span {
+        padding: 0.4rem 0;
+        text-align: center;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(20, 24, 40, 0.28);
+      }
+      .weekdays .sun { color: var(--signal); }
+
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0;
+        border: 1px solid rgba(20, 24, 40, 0.22);
+      }
+      .day {
+        min-height: 6.5rem;
+        padding: 0.4rem 0.4rem 0.5rem;
+        background: rgba(255, 255, 255, 0.78);
+        border-right: 1px solid rgba(20, 24, 40, 0.12);
+        border-bottom: 1px solid rgba(20, 24, 40, 0.12);
+        font-size: 0.72rem;
+        line-height: 1.3;
+      }
+      .day:nth-child(7n) { border-right: none; }
+      .day.muted { opacity: 0.4; }
+      .day .n {
+        display: block;
+        font-weight: 800;
+        font-size: 0.85rem;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.25rem;
+      }
+      .day.today {
+        background: #fff;
+        box-shadow: inset 0 0 0 2px var(--signal);
+      }
+      .day.today .n { color: var(--signal); }
+      .day .t {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .day .t.done {
+        color: oklch(50% 0.02 255);
+        text-decoration: line-through;
+      }
+      .day .bar {
+        display: block;
+        height: 3px;
+        width: 65%;
+        margin-top: 0.2rem;
+        background: var(--signal);
+      }
+      .day .more {
+        margin-top: 0.15rem;
+        font-weight: 700;
+        font-size: 0.65rem;
+        letter-spacing: 0.04em;
+        color: var(--signal);
+      }
+
+      .rail {
+        border: 1px solid rgba(20, 24, 40, 0.22);
+        background: rgba(255, 255, 255, 0.72);
+        padding: 0.85rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .rail h2 {
+        margin: 0 0 0.45rem;
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: oklch(42% 0.02 255);
+      }
+      .year-box {
+        text-align: center;
+        font-weight: 800;
+        font-size: 1.35rem;
+        letter-spacing: -0.03em;
+        border: 1px solid rgba(20, 24, 40, 0.2);
+        padding: 0.35rem;
+        background: #fff;
+      }
+      .spin {
+        display: flex;
+        gap: 0.35rem;
+        margin-top: 0.35rem;
+      }
+      .spin button {
+        flex: 1;
+        appearance: none;
+        border: 1px solid rgba(20, 24, 40, 0.2);
+        background: #fff;
+        font: inherit;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.25rem;
+        cursor: pointer;
+      }
+      .months {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+      }
+      .months button {
+        appearance: none;
+        border: 1px solid rgba(20, 24, 40, 0.15);
+        background: #fff;
+        font: inherit;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.3rem 0;
+        cursor: pointer;
+      }
+      .months button[aria-pressed="true"] {
+        background: var(--signal);
+        border-color: var(--signal);
+        color: #fff;
+      }
+      .filters .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .filters button {
+        appearance: none;
+        border: 1px solid rgba(20, 24, 40, 0.2);
+        background: #fff;
+        font: inherit;
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 0.2rem 0.4rem;
+        cursor: pointer;
+      }
+      .filters button[aria-pressed="true"] {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+      .filters button.reset {
+        width: 100%;
+        margin-top: 0.35rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 0.62rem;
+      }
+
+      .note {
+        margin-top: 1.5rem;
+        padding: 0.85rem 1rem;
+        border-left: 3px solid var(--signal);
+        background: rgba(255, 255, 255, 0.85);
+        font-size: 0.85rem;
+        line-height: 1.5;
+        max-width: 40rem;
+      }
+      .note code {
+        font-size: 0.8em;
+        background: rgba(20, 24, 40, 0.06);
+        padding: 0.1em 0.35em;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="index.html">Desk<span>List</span></a>
+        <nav class="nav" aria-label="주요">
+          <a href="#" aria-current="page">달력</a>
+          <a href="#">할일</a>
+          <a href="#">만다라트</a>
+          <a href="#">설정</a>
+        </nav>
+      </div>
+    </header>
+
+    <p class="banner">
+      <strong>본 목업에 반영됨</strong> · 본문 E + 상단 B ·
+      <a href="calendar.html">달력 목업</a> ·
+      <a href="design-variants.html">샘플 보드</a>
+    </p>
+
+    <main class="main">
+      <h1 class="page-title">september</h1>
+      <p class="page-sub">2026 · grid · signal ultramarine <i class="reg" aria-hidden="true"></i></p>
+
+      <div class="cal-layout">
+        <div>
+          <div class="toolbar">
+            <div class="ym">2026년 9월</div>
+            <div class="seg" role="group" aria-label="하루 표시">
+              <button type="button" aria-pressed="true">8</button>
+              <button type="button" aria-pressed="false">16</button>
+            </div>
+          </div>
+
+          <div class="weekdays" aria-hidden="true">
+            <span class="sun">Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+          </div>
+          <div class="cal-grid" aria-label="월간 달력 미리보기">
+            <div class="day muted"><span class="n">30</span></div>
+            <div class="day muted"><span class="n">31</span></div>
+            <div class="day"><span class="n">1</span></div>
+            <div class="day"><span class="n">2</span></div>
+            <div class="day"><span class="n">3</span></div>
+            <div class="day"><span class="n">4</span></div>
+            <div class="day"><span class="n">5</span></div>
+
+            <div class="day"><span class="n">6</span></div>
+            <div class="day"><span class="n">7</span></div>
+            <div class="day"><span class="n">8</span></div>
+            <div class="day"><span class="n">9</span></div>
+            <div class="day"><span class="n">10</span></div>
+            <div class="day"><span class="n">11</span></div>
+            <div class="day"><span class="n">12</span></div>
+
+            <div class="day"><span class="n">13</span></div>
+            <div class="day"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width: 50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t">키워드 조사</span>
+              <span class="more">+2 더보기</span>
+            </div>
+            <div class="day">
+              <span class="n">17</span>
+              <span class="t">카드뉴스</span>
+              <i class="bar" style="width: 100%"></i>
+            </div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span><span class="t">초안 작성</span></div>
+
+            <div class="day"><span class="n">20</span><span class="t">포스팅</span></div>
+            <div class="day"><span class="n">21</span><span class="t">뉴스레터</span></div>
+            <div class="day"><span class="n">22</span></div>
+            <div class="day"><span class="n">23</span></div>
+            <div class="day"><span class="n">24</span><span class="t">미팅</span></div>
+            <div class="day"><span class="n">25</span></div>
+            <div class="day"><span class="n">26</span></div>
+
+            <div class="day"><span class="n">27</span></div>
+            <div class="day"><span class="n">28</span></div>
+            <div class="day"><span class="n">29</span></div>
+            <div class="day"><span class="n">30</span></div>
+            <div class="day muted"><span class="n">1</span></div>
+            <div class="day muted"><span class="n">2</span></div>
+            <div class="day muted"><span class="n">3</span></div>
+          </div>
+        </div>
+
+        <aside class="rail" aria-label="달력 조작">
+          <div>
+            <h2>연도</h2>
+            <div class="year-box">2026</div>
+            <div class="spin">
+              <button type="button" aria-label="연도 증가">▲</button>
+              <button type="button" aria-label="연도 감소">▼</button>
+            </div>
+          </div>
+          <div>
+            <h2>월</h2>
+            <div class="months">
+              <button type="button">1</button><button type="button">2</button><button type="button">3</button>
+              <button type="button">4</button><button type="button">5</button><button type="button">6</button>
+              <button type="button">7</button><button type="button">8</button>
+              <button type="button" aria-pressed="true">9</button>
+              <button type="button">10</button><button type="button">11</button><button type="button">12</button>
+            </div>
+          </div>
+          <div class="filters">
+            <h2>필터</h2>
+            <div class="chips">
+              <button type="button" aria-pressed="true">일정</button>
+              <button type="button" aria-pressed="true">할일</button>
+              <button type="button" aria-pressed="true">회의</button>
+            </div>
+            <div class="chips" style="margin-top: 0.35rem">
+              <button type="button" aria-pressed="true">높음</button>
+              <button type="button" aria-pressed="true">중간</button>
+              <button type="button" aria-pressed="true">낮음</button>
+            </div>
+            <button type="button" class="reset">필터 해제</button>
+          </div>
+        </aside>
+      </div>
+
+      <p class="note">
+        이 페이지는 승인 당시의 <strong>정적 스냅샷</strong>입니다.
+        라이브 목업은 <code>mockups/css/tokens.css</code> · <code>mock.css</code>에 동일 톤이 적용되어 있습니다.
+      </p>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>달력 · DeskList 목업</title>
+    <link rel="stylesheet" href="css/mock.css" />
+    <style>
+      .task-overflow {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--ink-muted);
+        margin-top: 0.15rem;
+        font-family: var(--font-mono);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="index.html">Desk<span>List</span></a>
+        <nav class="nav" aria-label="주요">
+          <a href="calendar.html" aria-current="page">달력</a>
+          <a href="todos.html">할일</a>
+          <a href="mandalart.html">만다라트</a>
+          <a href="settings.html">설정</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="planner-title">
+        <h1>Monthly Planner</h1>
+        <p>Plan your month, live your dream · 할일 스토어와 연동</p>
+      </div>
+
+      <div class="cal-layout">
+        <div>
+          <div class="cal-toolbar">
+            <div class="ym-label" id="ym-label">—</div>
+            <div class="density-toggle">
+              <span>하루 표시</span>
+              <div class="seg" role="group" aria-label="셀 표시 밀도">
+                <button type="button" id="dens-8" aria-pressed="true">8</button>
+                <button type="button" id="dens-16" aria-pressed="false">16</button>
+              </div>
+              <span class="hint-inline" style="margin:0">초과 시 <span class="lamp lamp--yellow"></span> / <span class="lamp lamp--orange"></span></span>
+            </div>
+          </div>
+
+          <div class="weekdays" id="weekdays" aria-hidden="true"></div>
+          <div class="cal-grid" id="cal-grid" data-density="8" aria-label="월간 달력"></div>
+        </div>
+
+        <aside class="cal-rail" aria-label="달력 조작">
+          <div>
+            <h2>연도</h2>
+            <div class="year-spin">
+              <output id="year-out">2026</output>
+              <div class="spin-btns">
+                <button type="button" class="btn" id="year-up" aria-label="연도 증가">▲</button>
+                <button type="button" class="btn" id="year-down" aria-label="연도 감소">▼</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2>월</h2>
+            <div class="month-grid">
+              <button type="button">1</button>
+              <button type="button">2</button>
+              <button type="button">3</button>
+              <button type="button">4</button>
+              <button type="button">5</button>
+              <button type="button">6</button>
+              <button type="button">7</button>
+              <button type="button">8</button>
+              <button type="button">9</button>
+              <button type="button">10</button>
+              <button type="button">11</button>
+              <button type="button">12</button>
+            </div>
+          </div>
+          <div class="start-day">
+            <h2>시작일</h2>
+            <select id="week-start" aria-label="주 시작 요일">
+              <option value="sun">일요일</option>
+              <option value="mon">월요일</option>
+            </select>
+          </div>
+          <div class="cal-rail__filters">
+            <h2>필터</h2>
+            <div class="cal-filters" id="cal-filters" aria-label="달력 필터"></div>
+          </div>
+        </aside>
+      </div>
+    </main>
+    <script src="js/store.js"></script>
+    <script src="js/calendar-page.js"></script>
+  </body>
+</html>

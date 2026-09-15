@@ -1,0 +1,45 @@
+:root {
+  /* E · Grid Signal (본문) */
+  --signal: oklch(45% 0.19 264);
+  --ink: oklch(16% 0.01 255);
+  --paper: oklch(99% 0.003 255);
+  --paper-2: rgba(255, 255, 255, 0.78);
+  --paper-solid: #fff;
+  --grid-line: rgba(20, 24, 40, 0.06);
+
+  /* B · Blueprint (상단 네비) */
+  --bp-navy: #1a2a3a;
+  --bp-cyan: #5ba4b5;
+  --bp-muted: #3d5163;
+
+  /* Semantic aliases (기존 mock.css 호환) */
+  --ink-muted: oklch(42% 0.02 255);
+  --accent: var(--signal);
+  --accent-soft: rgba(255, 255, 255, 0.92);
+  --sage: var(--ink-muted);
+  --sage-wash: var(--grid-line);
+  --sun: var(--signal);
+  --line: rgba(20, 24, 40, 0.22);
+  --line-soft: rgba(20, 24, 40, 0.12);
+  --done: oklch(50% 0.02 255);
+
+  --font-sans: Archivo, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  --font-nav: Outfit, "Noto Sans KR", sans-serif;
+  --font-mono: Archivo, "IBM Plex Mono", monospace;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius: 0;
+  --max: 72rem;
+  --header-dark: var(--ink);
+  --pri-high: #c44b3c;
+  --pri-mid: var(--signal);
+  --pri-low: oklch(55% 0.02 255);
+  --nav-h: 3.25rem;
+}

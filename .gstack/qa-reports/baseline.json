@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-15",
+  "url": "http://localhost:8765/",
+  "healthScore": 98,
+  "issues": [
+    {
+      "id": "ISSUE-001",
+      "title": "Sticky header intercepts filter clicks on todos",
+      "severity": "medium",
+      "category": "ux"
+    },
+    {
+      "id": "ISSUE-002",
+      "title": "Progress slider exposed as readonly",
+      "severity": "low",
+      "category": "accessibility"
+    },
+    {
+      "id": "ISSUE-003",
+      "title": "Filter reset Material icon may not render",
+      "severity": "low",
+      "category": "visual"
+    },
+    {
+      "id": "ISSUE-004",
+      "title": "Mixed EN/KO page titles",
+      "severity": "low",
+      "category": "content"
+    }
+  ],
+  "categoryScores": {
+    "console": 100,
+    "links": 100,
+    "visual": 97,
+    "functional": 100,
+    "ux": 92,
+    "performance": 100,
+    "content": 97,
+    "accessibility": 97
+  }
+}

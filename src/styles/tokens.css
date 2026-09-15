@@ -1,0 +1,32 @@
+:root {
+  --ink: #1a1f1c;
+  --ink-muted: #5c6560;
+  --paper: #e6e2d8;
+  --paper-2: #f3f0ea;
+  --sage: #7d8f7a;
+  --sage-wash: #c5d1c0;
+  --accent: #1b6b5a;
+  --accent-soft: #d5ebe4;
+  --sun: #b54a3c;
+  --line: #c8c2b6;
+  --done: #6b736e;
+
+  --font-sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius: 4px;
+  --max: 78rem;
+  --header-dark: #3a3f3c;
+  --pri-high: #c44b3c;
+  --pri-mid: #d4a017;
+  --pri-low: #5a9e6f;
+  --nav-h: 3.5rem;
+}

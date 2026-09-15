@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>설정 · DeskList 목업</title>
+    <link rel="stylesheet" href="css/mock.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="index.html">Desk<span>List</span></a>
+        <nav class="nav" aria-label="주요">
+          <a href="calendar.html">달력</a>
+          <a href="todos.html">할일</a>
+          <a href="mandalart.html">만다라트</a>
+          <a href="settings.html" aria-current="page">설정</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1>설정</h1>
+          <p>
+            구분 ↔ 아이콘 마스터. 저장 시 할일·달력 아이콘에 반영됩니다.<br />
+            <span class="field-hint">데이터: localStorage</span>
+          </p>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button type="button" class="btn btn--primary" id="add-type">구분 추가</button>
+          <button type="button" class="btn" id="reset-seed">샘플 초기화</button>
+        </div>
+      </div>
+
+      <p class="note" style="margin-top: 0">
+        할일 폼 드롭다운·달력 셀 아이콘은 이 목록을 읽습니다.
+      </p>
+
+      <div class="settings-rows" id="settings-rows" style="margin-top: var(--space-4)"></div>
+
+      <p class="hint-inline" style="margin-top: var(--space-4)">
+        미리보기 (할일 폼 드롭다운):
+        <select aria-label="연동 미리보기" id="preview-select"></select>
+      </p>
+    </main>
+    <script src="js/store.js"></script>
+    <script src="js/settings-page.js"></script>
+  </body>
+</html>

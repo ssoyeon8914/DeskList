@@ -1,0 +1,32 @@
+---
+description: Route To-do-list Excel app work through project todo-* skills; no deploy.
+alwaysApply: true
+---
+
+# To-do-list skill routing
+
+When the request matches a phase below, read and follow the matching project skill under `.cursor/skills/` before freestyling.
+
+| Intent | Skill |
+|--------|-------|
+| Which skill / workflow / what’s next | `todo-workflow` |
+| MVP scope, brainstorm, cut features | `todo-office-hours` |
+| Specs, tickets, backlog split | `todo-spec` |
+| Architecture, data model lock | `todo-plan-eng-review` |
+| Design system / DESIGN.md | `todo-design-consultation` |
+| Plan UI slop check | `todo-plan-design-review` |
+| Design variants | `todo-design-shotgun` |
+| Lock HTML/CSS from approved design | `todo-design-html` |
+| Implemented UI polish | `todo-design-review` |
+| AI-slop / 밤티 redesign (Hallmark) | `todo-hallmark` |
+| Apple HIG / a11y craft review | `todo-apple-design` |
+| Multi-skill UI/UX orchestration | `todo-uiux` |
+| QA report without fixes | `todo-qa-only` |
+| Bugs / root cause | `todo-investigate` |
+| Architecture/data-flow diagram | `todo-diagram` |
+
+Always load `.cursor/skills/todo-workflow/constraints.md` and `excel-domain.md` for product work.
+
+Design anti-slop pack sources: `.cursor/skills/DESIGN-SKILLS.md`.
+
+Do not start deploy, ship, land-and-deploy, or canary work unless the user explicitly overrides later.

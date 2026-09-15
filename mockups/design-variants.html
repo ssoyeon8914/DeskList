@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>디자인 샘플 A–I · DeskList</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Black+Han+Sans&family=DM+Sans:opsz,wght@9..40,400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Instrument+Serif&family=JetBrains+Mono:wght@500;600&family=Noto+Sans+KR:wght@400;500;600;700&family=Outfit:wght@500;650;700&family=Source+Serif+4:opsz,wght@8..60,400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 1.25rem 1.5rem 3rem;
+        background: #ececec;
+        color: #1a1a1a;
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      }
+      .board-head {
+        max-width: 72rem;
+        margin: 0 auto 1.25rem;
+      }
+      .board-head h1 {
+        margin: 0 0 0.35rem;
+        font-size: 1.35rem;
+        font-weight: 700;
+      }
+      .board-head p {
+        margin: 0 0 0.65rem;
+        color: #555;
+        font-size: 0.92rem;
+        line-height: 1.45;
+      }
+      .board-head a { color: #1a1a1a; }
+      .jump {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        font-size: 0.78rem;
+      }
+      .jump a {
+        display: inline-block;
+        padding: 0.25rem 0.55rem;
+        border: 1px solid #bbb;
+        background: #fff;
+        text-decoration: none;
+        color: #222;
+      }
+      .jump a:hover { border-color: #333; }
+      .section-label {
+        max-width: 72rem;
+        margin: 1.75rem auto 0.75rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #666;
+      }
+      .grid {
+        max-width: 72rem;
+        margin: 0 auto;
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 1100px) {
+        .grid { grid-template-columns: repeat(3, 1fr); }
+      }
+      .card {
+        border: 1px solid #c8c8c8;
+        background: #fff;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        scroll-margin-top: 1rem;
+      }
+      .card__meta {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid #ddd;
+        background: #f7f7f7;
+      }
+      .card__meta strong {
+        display: block;
+        font-size: 0.95rem;
+        margin-bottom: 0.2rem;
+      }
+      .card__meta span {
+        font-size: 0.78rem;
+        color: #666;
+        line-height: 1.35;
+      }
+      .stage {
+        min-height: 28rem;
+        padding: 1rem;
+      }
+
+      .mini-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.75rem;
+        gap: 0.5rem;
+      }
+      .mini-nav .brand { text-decoration: none; font-weight: 700; }
+      .mini-nav nav { display: flex; gap: 0.65rem; font-size: 0.72rem; }
+      .mini-nav nav a { text-decoration: none; }
+      .mini-title { margin: 0 0 0.15rem; }
+      .mini-sub { margin: 0 0 0.75rem; font-size: 0.72rem; }
+      .weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        margin-bottom: 1px;
+        font-size: 0.62rem;
+        text-align: center;
+        font-weight: 600;
+      }
+      .weekdays span { padding: 0.3rem 0; }
+      .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+      }
+      .day {
+        min-height: 4.4rem;
+        padding: 0.28rem 0.3rem;
+        font-size: 0.62rem;
+        line-height: 1.25;
+      }
+      .day .n { font-weight: 700; display: block; margin-bottom: 0.2rem; }
+      .day .t { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .day .bar {
+        height: 2px;
+        margin-top: 0.15rem;
+        width: 70%;
+      }
+      .muted { opacity: 0.45; }
+
+      /* ========== A: Ink Notebook ========== */
+      .a-stage {
+        background: #f4f5f3;
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      }
+      .a-stage .brand { color: #141816; font-size: 1rem; letter-spacing: -0.03em; }
+      .a-stage .brand span { color: #2f5bff; }
+      .a-stage nav a { color: #5a5f5c; }
+      .a-stage nav a[aria-current] {
+        color: #141816;
+        border-bottom: 2px solid #2f5bff;
+      }
+      .a-stage .mini-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #141816;
+        letter-spacing: -0.02em;
+      }
+      .a-stage .mini-sub {
+        color: #6a706c;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .a-stage .weekdays { background: #141816; gap: 0; }
+      .a-stage .weekdays span { color: #f4f5f3; background: #141816; }
+      .a-stage .weekdays .sun { color: #ffb4a8; }
+      .a-stage .days { background: #c5c8c4; }
+      .a-stage .day { background: #fff; color: #141816; border-radius: 0; }
+      .a-stage .day .n { font-family: "JetBrains Mono", monospace; font-size: 0.68rem; }
+      .a-stage .day.today {
+        outline: 1.5px solid #2f5bff;
+        outline-offset: -1.5px;
+      }
+      .a-stage .day .bar { background: #2f5bff; }
+      .a-stage .day .t.done { color: #7a807c; text-decoration: line-through; }
+
+      /* ========== B: Studio Blueprint ========== */
+      .b-stage {
+        background: #d8e0e8;
+        font-family: Outfit, "Noto Sans KR", sans-serif;
+        background-image:
+          linear-gradient(rgba(91, 164, 181, 0.18) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(91, 164, 181, 0.18) 1px, transparent 1px);
+        background-size: 16px 16px;
+      }
+      .b-stage .brand {
+        color: #1a2a3a;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .b-stage .brand span { color: #5ba4b5; }
+      .b-stage nav a { color: #3d5163; }
+      .b-stage nav a[aria-current] {
+        color: #1a2a3a;
+        box-shadow: inset 0 -2px 0 #5ba4b5;
+      }
+      .b-stage .mini-title {
+        font-size: 1.1rem;
+        font-weight: 650;
+        color: #1a2a3a;
+      }
+      .b-stage .mini-sub { color: #4a6275; }
+      .b-stage .weekdays { gap: 2px; background: transparent; }
+      .b-stage .weekdays span {
+        background: #1a2a3a;
+        color: #e8f2f6;
+        border-radius: 2px;
+      }
+      .b-stage .weekdays .sun { color: #9fd4e0; }
+      .b-stage .days { gap: 2px; background: transparent; }
+      .b-stage .day {
+        background: rgba(255, 255, 255, 0.92);
+        color: #1a2a3a;
+        border: 1px solid #5ba4b5;
+        border-radius: 2px;
+      }
+      .b-stage .day.today {
+        background: #fff;
+        box-shadow: inset 0 0 0 2px #1a2a3a;
+      }
+      .b-stage .day .bar { background: #5ba4b5; }
+      .b-stage .day .t.done { color: #6a8090; text-decoration: line-through; }
+
+      /* ========== C: Station Timetable ========== */
+      .c-stage {
+        background: #fafaf8;
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+        padding-top: 0;
+      }
+      .c-stage .strip {
+        background: #111;
+        color: #fafaf8;
+        margin: -1rem -1rem 0.85rem;
+        padding: 0.55rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .c-stage .strip .brand {
+        font-family: "Black Han Sans", "Noto Sans KR", sans-serif;
+        font-size: 1.15rem;
+        color: #fafaf8;
+        letter-spacing: -0.02em;
+      }
+      .c-stage .strip .brand span { color: #c4a035; }
+      .c-stage .strip nav a { color: #c8c8c4; }
+      .c-stage .strip nav a[aria-current] {
+        color: #c4a035;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .c-stage .mini-title {
+        font-family: "Black Han Sans", "Noto Sans KR", sans-serif;
+        font-size: 1.25rem;
+        color: #111;
+        letter-spacing: -0.02em;
+      }
+      .c-stage .mini-sub {
+        color: #555;
+        font-family: "IBM Plex Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 0.65rem;
+      }
+      .c-stage .weekdays { gap: 0; border-bottom: 2px solid #111; }
+      .c-stage .weekdays span {
+        background: transparent;
+        color: #111;
+        padding: 0.35rem 0;
+      }
+      .c-stage .weekdays .sun { color: #c4a035; }
+      .c-stage .days { gap: 0; border: 1px solid #111; }
+      .c-stage .day {
+        background: #fafaf8;
+        color: #111;
+        border-right: 1px solid #d0d0cc;
+        border-bottom: 1px solid #d0d0cc;
+        border-radius: 0;
+      }
+      .c-stage .day:nth-child(7n) { border-right: none; }
+      .c-stage .day.today {
+        background: #fff8e0;
+        box-shadow: inset 3px 0 0 #c4a035;
+      }
+      .c-stage .day .n {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.7rem;
+      }
+      .c-stage .day .bar { background: #c4a035; }
+      .c-stage .day .t.done { color: #888; text-decoration: line-through; }
+      .c-stage .filter-hint {
+        margin-top: 0.65rem;
+        font-size: 0.68rem;
+        color: #444;
+      }
+      .c-stage .filter-hint u {
+        text-decoration-color: #c4a035;
+        text-underline-offset: 2px;
+        cursor: default;
+      }
+
+      /* ========== D: Cobalt Workbench ========== */
+      .d-stage {
+        background: oklch(98.5% 0.004 250);
+        font-family: "Noto Sans KR", "Space Grotesk", sans-serif;
+        color: oklch(24% 0.02 258);
+      }
+      .d-stage .tool-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin: -1rem -1rem 0.85rem;
+        padding: 0.5rem 0.85rem;
+        border-bottom: 1px solid oklch(88% 0.01 250);
+        background: oklch(99% 0.003 250);
+      }
+      .d-stage .brand {
+        font-family: "Space Grotesk", "Noto Sans KR", sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: -0.03em;
+        color: oklch(24% 0.02 258);
+        text-decoration: none;
+      }
+      .d-stage .brand span { color: oklch(58% 0.2 256); }
+      .d-stage .tool-nav nav {
+        display: flex;
+        gap: 0.7rem;
+        font-size: 0.7rem;
+      }
+      .d-stage .tool-nav nav a {
+        color: oklch(42% 0.02 257);
+        text-decoration: none;
+      }
+      .d-stage .tool-nav nav a[aria-current] {
+        color: oklch(58% 0.2 256);
+        box-shadow: inset 0 -1.5px 0 oklch(58% 0.2 256);
+      }
+      .d-stage .cmdk {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        padding: 0.2rem 0.45rem;
+        border: 1px solid oklch(88% 0.01 250);
+        border-radius: 6px;
+        color: oklch(42% 0.02 257);
+        background: #fff;
+      }
+      .d-stage .mini-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        margin: 0 0 0.15rem;
+      }
+      .d-stage .mini-sub {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        color: oklch(45% 0.02 257);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .d-stage .weekdays { gap: 0; background: transparent; border-bottom: 1px solid oklch(88% 0.01 250); }
+      .d-stage .weekdays span {
+        background: transparent;
+        color: oklch(42% 0.02 257);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
+        font-weight: 500;
+      }
+      .d-stage .weekdays .sun { color: oklch(58% 0.2 256); }
+      .d-stage .days { gap: 0; background: transparent; border: 1px solid oklch(88% 0.01 250); }
+      .d-stage .day {
+        background: oklch(99.2% 0.002 250);
+        border-right: 1px solid oklch(90% 0.008 250);
+        border-bottom: 1px solid oklch(90% 0.008 250);
+        border-radius: 0;
+      }
+      .d-stage .day:nth-child(7n) { border-right: none; }
+      .d-stage .day .n {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        font-weight: 600;
+      }
+      .d-stage .day.today {
+        outline: 1.5px solid oklch(58% 0.2 256);
+        outline-offset: -1.5px;
+        background: #fff;
+      }
+      .d-stage .day .bar { background: oklch(58% 0.2 256); border-radius: 1px; }
+      .d-stage .day .t.done { color: oklch(55% 0.015 257); text-decoration: line-through; }
+      .d-stage .overflow {
+        font-family: "JetBrains Mono", monospace;
+        color: oklch(58% 0.2 256);
+        font-weight: 600;
+      }
+
+      /* ========== E: Grid Signal ========== */
+      .e-stage {
+        --signal: oklch(45% 0.19 264);
+        --ink: oklch(16% 0.01 255);
+        --paper: oklch(99% 0.003 255);
+        background: var(--paper);
+        font-family: Archivo, "Noto Sans KR", sans-serif;
+        color: var(--ink);
+        background-image:
+          linear-gradient(rgba(20, 24, 40, 0.07) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20, 24, 40, 0.07) 1px, transparent 1px);
+        background-size: calc(100% / 12) calc(100% / 12);
+        background-position: 0 0;
+      }
+      .e-stage .brand {
+        font-family: Archivo, sans-serif;
+        font-weight: 800;
+        font-size: 0.85rem;
+        letter-spacing: -0.04em;
+        text-transform: lowercase;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .e-stage .brand span {
+        display: inline-block;
+        width: 0.42em;
+        height: 0.42em;
+        background: var(--signal);
+        margin-left: 0.15em;
+        vertical-align: 0.05em;
+      }
+      .e-stage nav a {
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: oklch(40% 0.02 255);
+        text-decoration: none;
+      }
+      .e-stage nav a[aria-current] {
+        color: var(--signal);
+        box-shadow: inset 0 -3px 0 var(--signal);
+      }
+      .e-stage .mini-title {
+        font-family: Archivo, sans-serif;
+        font-weight: 800;
+        font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+        letter-spacing: -0.045em;
+        line-height: 0.92;
+        text-transform: lowercase;
+        margin: 0.35rem 0 0.2rem;
+        max-width: 8ch;
+      }
+      .e-stage .mini-title::after {
+        content: "";
+        display: block;
+        width: 2.5rem;
+        height: 3px;
+        background: var(--signal);
+        margin-top: 0.35rem;
+      }
+      .e-stage .mini-sub {
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: oklch(42% 0.02 255);
+      }
+      .e-stage .weekdays { gap: 0; background: transparent; }
+      .e-stage .weekdays span {
+        font-size: 0.58rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink);
+        background: transparent;
+        border-bottom: 1px solid rgba(20, 24, 40, 0.25);
+      }
+      .e-stage .weekdays .sun { color: var(--signal); }
+      .e-stage .days { gap: 0; background: transparent; border: 1px solid rgba(20, 24, 40, 0.2); }
+      .e-stage .day {
+        background: rgba(255, 255, 255, 0.72);
+        border-right: 1px solid rgba(20, 24, 40, 0.12);
+        border-bottom: 1px solid rgba(20, 24, 40, 0.12);
+      }
+      .e-stage .day:nth-child(7n) { border-right: none; }
+      .e-stage .day .n {
+        font-weight: 800;
+        font-size: 0.75rem;
+        letter-spacing: -0.03em;
+      }
+      .e-stage .day.today {
+        background: #fff;
+        box-shadow: inset 0 0 0 2px var(--signal);
+      }
+      .e-stage .day.today .n { color: var(--signal); }
+      .e-stage .day .bar { background: var(--signal); height: 3px; }
+      .e-stage .day .t.done { color: oklch(50% 0.02 255); text-decoration: line-through; }
+      .e-stage .reg {
+        display: inline-block;
+        width: 0.55rem;
+        height: 0.55rem;
+        border: 1px solid var(--ink);
+        border-radius: 50%;
+        position: relative;
+        margin-left: 0.25rem;
+        vertical-align: middle;
+      }
+      .e-stage .reg::before,
+      .e-stage .reg::after {
+        content: "";
+        position: absolute;
+        background: var(--ink);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .e-stage .reg::before { width: 1px; height: 100%; }
+      .e-stage .reg::after { width: 100%; height: 1px; }
+
+      /* ========== F: Index Desk ========== */
+      .f-stage {
+        background: #f3f3f1;
+        font-family: "Noto Sans KR", sans-serif;
+        color: #111;
+        padding: 0;
+      }
+      .f-stage .mast {
+        background: #ebebe8;
+        border-bottom: 1px solid #111;
+        padding: 0.55rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .f-stage .brand {
+        font-weight: 800;
+        font-size: 1rem;
+        letter-spacing: -0.04em;
+        color: #111;
+        text-decoration: none;
+      }
+      .f-stage .brand span { font-weight: 500; color: #444; }
+      .f-stage .mast nav {
+        display: flex;
+        gap: 0.75rem;
+        font-size: 0.7rem;
+      }
+      .f-stage .mast nav a {
+        color: #333;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+      }
+      .f-stage .mast nav a[aria-current] {
+        border-bottom-color: #111;
+        font-weight: 700;
+      }
+      .f-stage .body {
+        padding: 0.85rem 1rem 1rem;
+      }
+      .f-stage .intro {
+        margin: 0 0 0.75rem;
+        font-size: 0.78rem;
+        color: #333;
+        max-width: 36ch;
+        line-height: 1.45;
+      }
+      .f-stage .mini-title { display: none; }
+      .f-stage .mini-sub {
+        margin: 0 0 0.5rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #555;
+        font-family: "IBM Plex Mono", monospace;
+      }
+      .f-stage .weekdays {
+        gap: 0;
+        background: #e4e4e0;
+        border-top: 1px solid #111;
+        border-bottom: 1px solid #111;
+      }
+      .f-stage .weekdays span {
+        background: transparent;
+        color: #111;
+        font-size: 0.58rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      .f-stage .weekdays .sun { color: #111; opacity: 0.55; }
+      .f-stage .days { gap: 0; background: #fafaf8; border: none; border-bottom: 1px solid #111; }
+      .f-stage .day {
+        background: #fafaf8;
+        border-right: 1px solid #d8d8d4;
+        border-bottom: 1px solid #d8d8d4;
+        min-height: 4.2rem;
+      }
+      .f-stage .day:nth-child(7n) { border-right: none; }
+      .f-stage .day .n {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.68rem;
+      }
+      .f-stage .day.today {
+        background: #fff;
+        box-shadow: inset 3px 0 0 #111;
+      }
+      .f-stage .day .bar { background: #111; height: 1.5px; }
+      .f-stage .day .t.done { color: #888; text-decoration: line-through; }
+      .f-stage .kpi-line {
+        margin-top: 0.7rem;
+        padding-top: 0.55rem;
+        border-top: 1px solid #ccc;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.65rem;
+        color: #333;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+      .f-stage .kpi-line b { color: #111; }
+
+      /* ========== G: Coral modern-minimal ========== */
+      .g-stage {
+        background: oklch(96% 0.006 60);
+        font-family: "DM Sans", "Noto Sans KR", sans-serif;
+        color: oklch(22% 0.01 50);
+      }
+      .g-stage .mini-nav {
+        margin: -1rem -1rem 0.85rem;
+        padding: 0.55rem 1rem;
+        border-bottom: 1px solid oklch(90% 0.008 60);
+        background: oklch(98% 0.004 60);
+        align-items: center;
+      }
+      .g-stage .brand {
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        font-size: 1rem;
+        color: oklch(22% 0.01 50);
+        text-decoration: none;
+      }
+      .g-stage .brand span { color: oklch(62% 0.17 35); }
+      .g-stage nav a {
+        color: oklch(45% 0.015 50);
+        font-size: 0.72rem;
+        font-weight: 500;
+      }
+      .g-stage nav a[aria-current] {
+        color: oklch(22% 0.01 50);
+        font-weight: 600;
+      }
+      .g-stage .pill {
+        font-size: 0.65rem;
+        font-weight: 600;
+        padding: 0.28rem 0.7rem;
+        border-radius: 999px;
+        background: oklch(22% 0.01 50);
+        color: #fff;
+        border: none;
+      }
+      .g-stage .mini-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        margin: 0 0 0.2rem;
+      }
+      .g-stage .mini-sub {
+        color: oklch(48% 0.015 50);
+        font-size: 0.72rem;
+        margin-bottom: 0.85rem;
+      }
+      .g-stage .weekdays { gap: 0.35rem; background: transparent; margin-bottom: 0.35rem; }
+      .g-stage .weekdays span {
+        background: transparent;
+        color: oklch(48% 0.015 50);
+        font-size: 0.58rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+      .g-stage .weekdays .sun { color: oklch(62% 0.17 35); }
+      .g-stage .days { gap: 0.35rem; background: transparent; }
+      .g-stage .day {
+        background: #fff;
+        border: 1px solid oklch(91% 0.006 60);
+        border-radius: 8px;
+        box-shadow: none;
+      }
+      .g-stage .day.today {
+        border-color: oklch(62% 0.17 35);
+        box-shadow: 0 0 0 1px oklch(62% 0.17 35);
+      }
+      .g-stage .day .n { font-weight: 600; letter-spacing: -0.02em; }
+      .g-stage .day .bar {
+        background: oklch(62% 0.17 35);
+        border-radius: 999px;
+        height: 3px;
+      }
+      .g-stage .day .t.done { color: oklch(55% 0.01 50); text-decoration: line-through; }
+
+      /* ========== H: Lumen Day Foundry ========== */
+      .h-stage {
+        --paper: oklch(97% 0.008 265);
+        --ink: oklch(22% 0.02 265);
+        --accent: oklch(46% 0.18 268);
+        --coral: oklch(68% 0.16 18);
+        background:
+          linear-gradient(rgba(40, 30, 80, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(40, 30, 80, 0.035) 1px, transparent 1px),
+          radial-gradient(60% 50% at 85% 15%, oklch(46% 0.24 268 / 0.06) 0%, transparent 65%),
+          var(--paper);
+        background-size: 32px 32px, 32px 32px, auto, auto;
+        font-family: "Noto Sans KR", "DM Sans", sans-serif;
+        color: var(--ink);
+      }
+      .h-stage .eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: oklch(45% 0.03 265);
+        margin: 0 0 0.35rem;
+      }
+      .h-stage .brand {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-weight: 400;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+        text-transform: lowercase;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .h-stage .brand span {
+        color: var(--coral);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+      }
+      .h-stage nav a {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: oklch(42% 0.03 265);
+      }
+      .h-stage nav a[aria-current] { color: var(--accent); }
+      .h-stage .mini-title {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-weight: 400;
+        font-size: 1.55rem;
+        letter-spacing: -0.02em;
+        text-transform: lowercase;
+        line-height: 1.15;
+        margin: 0.15rem 0 0.25rem;
+      }
+      .h-stage .mini-title em {
+        font-style: normal;
+        color: var(--coral);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+      }
+      .h-stage .mini-sub {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: oklch(45% 0.03 265);
+      }
+      .h-stage .weekdays { gap: 0; border-bottom: 1px solid oklch(88% 0.015 265); }
+      .h-stage .weekdays span {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.55rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: oklch(42% 0.03 265);
+        background: transparent;
+      }
+      .h-stage .weekdays .sun { color: var(--accent); }
+      .h-stage .days { gap: 0; border: 1px solid oklch(88% 0.015 265); background: transparent; }
+      .h-stage .day {
+        background: oklch(99% 0.004 265 / 0.85);
+        border-right: 1px solid oklch(90% 0.012 265);
+        border-bottom: 1px solid oklch(90% 0.012 265);
+      }
+      .h-stage .day:nth-child(7n) { border-right: none; }
+      .h-stage .day .n {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-size: 0.85rem;
+        font-weight: 400;
+        font-variant-numeric: tabular-nums;
+      }
+      .h-stage .day.today {
+        outline: 1px solid var(--accent);
+        outline-offset: -1px;
+        background: #fff;
+      }
+      .h-stage .day .bar { background: var(--accent); height: 1.5px; }
+      .h-stage .day .t.done { color: oklch(55% 0.02 265); text-decoration: line-through; }
+      .h-stage .meter {
+        margin-top: 0.65rem;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border: 1px solid oklch(88% 0.015 265);
+      }
+      .h-stage .meter div {
+        padding: 0.45rem 0.5rem;
+        border-right: 1px solid oklch(88% 0.015 265);
+      }
+      .h-stage .meter div:last-child { border-right: none; }
+      .h-stage .meter strong {
+        display: block;
+        font-family: "Instrument Serif", Georgia, serif;
+        font-size: 1.35rem;
+        font-weight: 400;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+      }
+      .h-stage .meter span {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.52rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: oklch(45% 0.03 265);
+      }
+
+      /* ========== I: Newsprint editorial ========== */
+      .i-stage {
+        background: #f2efe8;
+        font-family: "Noto Sans KR", "Source Serif 4", Georgia, serif;
+        color: #1a1814;
+        background-image: radial-gradient(rgba(40, 35, 25, 0.04) 0.6px, transparent 0.6px);
+        background-size: 3px 3px;
+      }
+      .i-stage .paper-head {
+        border-bottom: 3px double #1a1814;
+        margin: -1rem -1rem 0.75rem;
+        padding: 0.55rem 1rem 0.65rem;
+        text-align: center;
+      }
+      .i-stage .folio {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin: 0 0 0.25rem;
+        color: #5a554c;
+      }
+      .i-stage .brand {
+        font-family: "Source Serif 4", Georgia, serif;
+        font-weight: 700;
+        font-size: 1.45rem;
+        letter-spacing: -0.02em;
+        color: #1a1814;
+        text-decoration: none;
+        display: block;
+        line-height: 1.1;
+      }
+      .i-stage .brand span { font-style: italic; font-weight: 400; }
+      .i-stage .rail {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 0.4rem;
+        font-size: 0.68rem;
+        font-family: "Noto Sans KR", sans-serif;
+      }
+      .i-stage .rail a {
+        color: #1a1814;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+      }
+      .i-stage .rail a[aria-current] {
+        border-bottom-color: #1a1814;
+        font-weight: 700;
+      }
+      .i-stage .mini-title {
+        font-family: "Source Serif 4", Georgia, serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0 0 0.15rem;
+        letter-spacing: -0.015em;
+      }
+      .i-stage .mini-sub {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.62rem;
+        color: #5a554c;
+        margin-bottom: 0.65rem;
+      }
+      .i-stage .weekdays {
+        gap: 0;
+        border-top: 1px solid #1a1814;
+        border-bottom: 1px solid #1a1814;
+        background: transparent;
+      }
+      .i-stage .weekdays span {
+        font-family: "Source Serif 4", Georgia, serif;
+        font-size: 0.62rem;
+        font-weight: 700;
+        background: transparent;
+        color: #1a1814;
+      }
+      .i-stage .weekdays .sun { color: #7a3b2e; }
+      .i-stage .days { gap: 0; border-bottom: 1px solid #1a1814; }
+      .i-stage .day {
+        background: transparent;
+        border-right: 1px solid #cfc8ba;
+        border-bottom: 1px solid #cfc8ba;
+        min-height: 4.3rem;
+      }
+      .i-stage .day:nth-child(7n) { border-right: none; }
+      .i-stage .day .n {
+        font-family: "Source Serif 4", Georgia, serif;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      .i-stage .day.today {
+        background: rgba(255, 255, 255, 0.55);
+        box-shadow: inset 0 -2px 0 #1a1814;
+      }
+      .i-stage .day .bar { background: #1a1814; height: 1.5px; }
+      .i-stage .day .t {
+        font-family: "Noto Sans KR", sans-serif;
+        font-size: 0.6rem;
+      }
+      .i-stage .day .t.done { color: #8a8478; text-decoration: line-through; }
+    </style>
+  </head>
+  <body>
+    <div class="board-head">
+      <h1>디자인 방향 샘플 A–I</h1>
+      <p>
+        같은 달력 조각으로만 톤을 비교합니다. 1차 A–C · 2차 D–F · 3차 G–I(Hallmark 추가).
+        <a href="calendar.html">기존 목업</a> · 채팅에 코드(A–I)를 알려 주세요.
+        · <a href="design-preview-e-b.html"><strong>E+B 합본 미리보기</strong></a>
+      </p>
+      <nav class="jump" aria-label="샘플 바로가기">
+        <a href="#a">A</a><a href="#b">B</a><a href="#c">C</a>
+        <a href="#d">D</a><a href="#e">E</a><a href="#f">F</a>
+        <a href="#g">G</a><a href="#h">H</a><a href="#i">I</a>
+      </nav>
+    </div>
+
+    <p class="section-label">1차 · A – C</p>
+    <div class="grid">
+      <article class="card" id="a">
+        <div class="card__meta">
+          <strong>A · 잉크 노트</strong>
+          <span>쿨 오프화이트 · 코발트 한 줄 · JetBrains Mono 날짜 · 그라데이션/블러 없음</span>
+        </div>
+        <div class="stage a-stage">
+          <div class="mini-nav">
+            <a class="brand" href="#">Desk<span>List</span></a>
+            <nav>
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+          </div>
+          <h2 class="mini-title">월간 달력</h2>
+          <p class="mini-sub">2026-09 · density 8</p>
+          <div class="weekdays">
+            <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+          </div>
+          <div class="days">
+            <div class="day muted"><span class="n">13</span></div>
+            <div class="day muted"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width:50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t">+2</span>
+            </div>
+            <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="b">
+        <div class="card__meta">
+          <strong>B · 스튜디오 블루프린트</strong>
+          <span>블루그레이 지면 · 시안 그리드 · 네이비 잉크 · 도면 범례 톤</span>
+        </div>
+        <div class="stage b-stage">
+          <div class="mini-nav">
+            <a class="brand" href="#">Desk<span>List</span></a>
+            <nav>
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+          </div>
+          <h2 class="mini-title">월간 달력</h2>
+          <p class="mini-sub">SHEET · 2026 / 09</p>
+          <div class="weekdays">
+            <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+          </div>
+          <div class="days">
+            <div class="day muted"><span class="n">13</span></div>
+            <div class="day muted"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width:50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t">+2</span>
+            </div>
+            <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="c">
+        <div class="card__meta">
+          <strong>C · 역무 시간표</strong>
+          <span>먹 헤더 바 · 머스타드 액센트 · 타이트 그리드 · 칩 대신 밑줄 토글</span>
+        </div>
+        <div class="stage c-stage">
+          <div class="strip">
+            <a class="brand" href="#">Desk<span>List</span></a>
+            <nav class="mini-nav" style="margin:0">
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+          </div>
+          <h2 class="mini-title">월간 달력</h2>
+          <p class="mini-sub">Sep 2026 · Timetable</p>
+          <div class="weekdays">
+            <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+          </div>
+          <div class="days">
+            <div class="day muted"><span class="n">13</span></div>
+            <div class="day muted"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width:50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t">+2</span>
+            </div>
+            <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span></div>
+          </div>
+          <p class="filter-hint">필터 · <u>일정</u> · <u>할일</u> · 회의 · 완료</p>
+        </div>
+      </article>
+    </div>
+
+    <p class="section-label" id="round2">2차 · D – F (Hallmark)</p>
+    <div class="grid">
+      <article class="card" id="d">
+        <div class="card__meta">
+          <strong>D · Cobalt 워크벤치</strong>
+          <span>쿨 엔지니니어드 지면 · 전기 코발트 &lt;5% · Space Grotesk + Mono · 헤어라인 · ⌘K 바</span>
+        </div>
+        <div class="stage d-stage">
+          <div class="tool-nav">
+            <a class="brand" href="#">Desk<span>List</span></a>
+            <nav>
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+            <span class="cmdk">⌘K</span>
+          </div>
+          <h2 class="mini-title">월간 달력</h2>
+          <p class="mini-sub">2026-09 · density 8</p>
+          <div class="weekdays">
+            <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+          </div>
+          <div class="days">
+            <div class="day muted"><span class="n">13</span></div>
+            <div class="day muted"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width:50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t overflow">+2</span>
+            </div>
+            <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="e">
+        <div class="card__meta">
+          <strong>E · Grid 신호</strong>
+          <span>노출 그리드 · Archivo 800 소문자 · 울트라마린 신호 1색 · 기하 마크</span>
+        </div>
+        <div class="stage e-stage">
+          <div class="mini-nav">
+            <a class="brand" href="#">desklist<span></span></a>
+            <nav>
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+          </div>
+          <h2 class="mini-title">september</h2>
+          <p class="mini-sub">2026 · grid 12 <i class="reg" aria-hidden="true"></i></p>
+          <div class="weekdays">
+            <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+          </div>
+          <div class="days">
+            <div class="day muted"><span class="n">13</span></div>
+            <div class="day muted"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width:50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t">+2</span>
+            </div>
+            <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="f">
+        <div class="card__meta">
+          <strong>F · 인덱스 데스크</strong>
+          <span>히어로 없음 · masthead · 목록=UI · KPI는 헤더 한 줄 · 오늘=왼쪽 바</span>
+        </div>
+        <div class="stage f-stage">
+          <div class="mast">
+            <a class="brand" href="#">Desk<span>List</span></a>
+            <nav>
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+          </div>
+          <div class="body">
+            <p class="intro">2026년 9월 · 날짜별 할일 인덱스. 슬로건 없음.</p>
+            <p class="mini-sub">Index · Sep 13–19</p>
+            <div class="weekdays">
+              <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+            </div>
+            <div class="days">
+              <div class="day muted"><span class="n">13</span></div>
+              <div class="day muted"><span class="n">14</span></div>
+              <div class="day today">
+                <span class="n">15</span>
+                <span class="t">블로그 포스팅</span>
+                <i class="bar" style="width:50%"></i>
+              </div>
+              <div class="day">
+                <span class="n">16</span>
+                <span class="t">신제품 미팅</span>
+                <span class="t">블로그 초안</span>
+                <span class="t done">일정 공유</span>
+                <span class="t">+2</span>
+              </div>
+              <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+              <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+              <div class="day"><span class="n">19</span></div>
+            </div>
+            <div class="kpi-line">
+              <span>전체 <b>14</b></span>
+              <span>시작전 <b>4</b></span>
+              <span>진행중 <b>6</b></span>
+              <span>완료 <b>4</b></span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <p class="section-label" id="round3">3차 · G – I (Hallmark 추가)</p>
+    <div class="grid">
+      <article class="card" id="g">
+        <div class="card__meta">
+          <strong>G · Coral 모던 미니멀</strong>
+          <span>웜 그레이이 · 코랄 액센트 · DM Sans · 8px 카드 셀 · pill CTA · D의 따뜻한 형제</span>
+        </div>
+        <div class="stage g-stage">
+          <div class="mini-nav">
+            <a class="brand" href="#">Desk<span>List</span></a>
+            <nav>
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+            <span class="pill">열기</span>
+          </div>
+          <h2 class="mini-title">월간 달력</h2>
+          <p class="mini-sub">2026년 9월 · 한눈에 보기</p>
+          <div class="weekdays">
+            <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+          </div>
+          <div class="days">
+            <div class="day muted"><span class="n">13</span></div>
+            <div class="day muted"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width:50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t">+2</span>
+            </div>
+            <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="h">
+        <div class="card__meta">
+          <strong>H · Lumen Day</strong>
+          <span>쿨 본색 · indigo + coral 동사 · Instrument Serif 소문자 · mono 라벨 · 미터 3칸</span>
+        </div>
+        <div class="stage h-stage">
+          <p class="eyebrow">Planner · instrument</p>
+          <div class="mini-nav">
+            <a class="brand" href="#">desk<span>list</span></a>
+            <nav>
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+          </div>
+          <h2 class="mini-title">월간을 <em>정리</em>하다</h2>
+          <p class="mini-sub">Sep 2026 · density 8</p>
+          <div class="weekdays">
+            <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+          </div>
+          <div class="days">
+            <div class="day muted"><span class="n">13</span></div>
+            <div class="day muted"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width:50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t">+2</span>
+            </div>
+            <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span></div>
+          </div>
+          <div class="meter" aria-label="요약">
+            <div><strong>14</strong><span>Total</span></div>
+            <div><strong>6</strong><span>Active</span></div>
+            <div><strong>4</strong><span>Done</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="i">
+        <div class="card__meta">
+          <strong>I · Newsprint 에디토리얼</strong>
+          <span>지문 텍스처 · 더블 룰 masthead · Source Serif · 신문 표제 · 대칭 네비</span>
+        </div>
+        <div class="stage i-stage">
+          <div class="paper-head">
+            <p class="folio">Vol. 09 · 2026</p>
+            <a class="brand" href="#">Desk<span>List</span></a>
+            <nav class="rail">
+              <a href="#" aria-current="page">달력</a>
+              <a href="#">할일</a>
+              <a href="#">설정</a>
+            </nav>
+          </div>
+          <h2 class="mini-title">9월의 할일</h2>
+          <p class="mini-sub">Edition · Sep 13–19</p>
+          <div class="weekdays">
+            <span class="sun">SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+          </div>
+          <div class="days">
+            <div class="day muted"><span class="n">13</span></div>
+            <div class="day muted"><span class="n">14</span></div>
+            <div class="day today">
+              <span class="n">15</span>
+              <span class="t">블로그 포스팅</span>
+              <i class="bar" style="width:50%"></i>
+            </div>
+            <div class="day">
+              <span class="n">16</span>
+              <span class="t">신제품 미팅</span>
+              <span class="t">블로그 초안</span>
+              <span class="t done">일정 공유</span>
+              <span class="t">+2</span>
+            </div>
+            <div class="day"><span class="n">17</span><span class="t">카드뉴스</span><i class="bar" style="width:100%"></i></div>
+            <div class="day"><span class="n">18</span><span class="t">기획</span></div>
+            <div class="day"><span class="n">19</span></div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </body>
+</html>

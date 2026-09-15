@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>목업 · To-do List</title>
+    <link rel="stylesheet" href="css/mock.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="index.html">Desk<span>List</span></a>
+        <nav class="nav" aria-label="주요">
+          <a href="calendar.html">달력</a>
+          <a href="todos.html">할일</a>
+          <a href="mandalart.html">만다라트</a>
+          <a href="settings.html">설정</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1>목업 진입</h1>
+          <p>
+            엑셀 시트와 1:1 — 달력 · 할일 · 만다라트 · 설정.<br />
+            <strong>동적 목업</strong>: 할일 CRUD·필터·KPI·달력 투영이 localStorage로 연동됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="hero-links">
+        <a href="calendar.html">
+          <strong>달력</strong>
+          할일 연동 · 연/월/시작일 · 8/16 · 필터 · overflow
+        </a>
+        <a href="todos.html">
+          <strong>할일</strong>
+          동적 CRUD · KPI · 필터 · 주간 달력 · localStorage 연동
+        </a>
+        <a href="mandalart.html">
+          <strong>만다라트</strong>
+          9×9 · 핵심/세부/실행 · 미러 동기화(본구현)
+        </a>
+        <a href="settings.html">
+          <strong>설정</strong>
+          구분 ↔ 아이콘 (일정·할일·회의)
+        </a>
+        <a href="design-variants.html">
+          <strong>디자인 샘플 A–I</strong>
+          1–3차 톤 비교 (Hallmark 포함)
+        </a>
+        <a href="design-preview-e-b.html">
+          <strong>디자인 E+B (스냅샷)</strong>
+          승인 당시 정적 미리보기 · 현재 목업에 반영됨
+        </a>
+      </div>
+
+      <ul class="checklist">
+        <li>달력 우측 컨트롤러가 엑셀과 같은 역할인가</li>
+        <li>할일 상단 대시보드 밀도·정보 계층이 괜찮은가</li>
+        <li>만다라트를 네비 1급으로 둘지</li>
+        <li>필터/KPI를 P0에 넣을지 P1로 둘지</li>
+      </ul>
+
+      <p class="note">결정은 <code>docs/mockup-notes.md</code>에 기록합니다.</p>
+    </main>
+  </body>
+</html>

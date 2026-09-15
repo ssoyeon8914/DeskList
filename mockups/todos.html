@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>할일 · DeskList 목업</title>
+    <link rel="stylesheet" href="css/mock.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="index.html">Desk<span>List</span></a>
+        <nav class="nav" aria-label="주요">
+          <a href="calendar.html">달력</a>
+          <a href="todos.html" aria-current="page">할일</a>
+          <a href="mandalart.html">만다라트</a>
+          <a href="settings.html">설정</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1>Planner</h1>
+          <p>주간 칸에서 날짜를 고르고, 아래 필터·요약으로 표를 좁힙니다.</p>
+        </div>
+      </div>
+
+      <section class="week-panel" aria-label="주간 달력" id="week-panel">
+        <div class="week-panel__head">
+          <h2>주간 달력</h2>
+          <div class="week-controls">
+            <label>연도
+              <select id="week-year" aria-label="주간 연도">
+                <option>2025</option>
+                <option selected>2026</option>
+                <option>2027</option>
+              </select>
+            </label>
+            <label>월
+              <select id="week-month" aria-label="주간 월">
+                <option>1</option><option>2</option><option>3</option><option>4</option>
+                <option>5</option><option>6</option><option>7</option><option>8</option>
+                <option selected>9</option><option>10</option><option>11</option><option>12</option>
+              </select>
+            </label>
+            <label>주차
+              <select id="week-week" aria-label="주차"></select>
+            </label>
+            <label>시작
+              <select id="week-start" aria-label="주 시작 요일">
+                <option value="sun">일요일</option>
+                <option value="mon">월요일</option>
+              </select>
+            </label>
+            <button type="button" class="btn" id="week-all">주 전체</button>
+          </div>
+        </div>
+        <div class="week-grid" id="week-grid" aria-label="주간 그리드"></div>
+      </section>
+
+      <section class="dash-lean" aria-label="필터·요약">
+        <div class="dash-panel">
+          <div class="summary-row">
+            <article class="metric-card metric-card--status" aria-label="상태·완료율">
+              <div class="status-board">
+                <div class="stat stat--total">
+                  <span class="stat__label">전체</span>
+                  <span class="stat__num" id="stat-total">0</span>
+                </div>
+                <div class="status-breakdown">
+                  <div class="status-stats status-stats--compact">
+                    <div class="stat">
+                      <span class="stat__label stat__label--muted">시작전</span>
+                      <span class="stat__num" id="stat-wait">0</span>
+                    </div>
+                    <div class="stat">
+                      <span class="stat__label stat__label--run">진행중</span>
+                      <span class="stat__num" id="stat-run">0</span>
+                    </div>
+                    <div class="stat">
+                      <span class="stat__label stat__label--done">완료</span>
+                      <span class="stat__num" id="stat-done">0</span>
+                    </div>
+                  </div>
+                  <div
+                    class="status-strip"
+                    id="status-strip"
+                    aria-hidden="true"
+                    style="grid-template-columns: 1fr 1fr 1fr"
+                  >
+                    <i class="seg-wait"></i>
+                    <i class="seg-run"></i>
+                    <i class="seg-done"></i>
+                  </div>
+                </div>
+                <div class="status-rate">
+                  <div class="donut" id="donut" style="--p: 0" aria-label="완료율 0%">
+                    <div class="donut__hole">
+                      <strong>0%</strong>
+                      <span>완료율</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="metric-card metric-card--priority" aria-label="우선순위별 완료">
+              <div class="pri-chart">
+                <div class="pri-col">
+                  <span class="pri-frac">0 / 0</span>
+                  <div class="pri-stack" style="--fill: 0%">
+                    <i class="pri-stack__done pri-high"></i>
+                    <i class="pri-stack__rest pri-high"></i>
+                  </div>
+                  <span class="pri-name">높음</span>
+                </div>
+                <div class="pri-col">
+                  <span class="pri-frac">0 / 0</span>
+                  <div class="pri-stack" style="--fill: 0%">
+                    <i class="pri-stack__done pri-mid"></i>
+                    <i class="pri-stack__rest pri-mid"></i>
+                  </div>
+                  <span class="pri-name">중간</span>
+                </div>
+                <div class="pri-col">
+                  <span class="pri-frac">0 / 0</span>
+                  <div class="pri-stack" style="--fill: 0%">
+                    <i class="pri-stack__done pri-low"></i>
+                    <i class="pri-stack__rest pri-low"></i>
+                  </div>
+                  <span class="pri-name">낮음</span>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div class="filter-bar" id="slicer-bank" aria-label="필터"></div>
+        </div>
+      </section>
+
+      <div class="todos-workspace">
+        <div class="todos-list-pane">
+          <div class="list-pane__head">
+            <div>
+              <h2 class="list-pane__title">할일 목록</h2>
+              <p class="list-pane__hint">행을 선택하면 오른쪽에서 바로 수정합니다</p>
+            </div>
+            <button type="button" class="btn btn--primary" id="btn-new-side">행 추가</button>
+          </div>
+          <div class="table-wrap table-wrap--workspace">
+            <table class="data" id="todo-table">
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>날짜</th>
+                  <th>카테고리</th>
+                  <th>우선순위</th>
+                  <th title="우선순위 파생 1/2/3">표시</th>
+                  <th>업무</th>
+                  <th>진행률</th>
+                  <th>상태</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="editor-pane" aria-label="할일 편집">
+          <form id="form" class="editor-form" action="#">
+            <header class="editor-pane__head">
+              <div>
+                <p class="editor-pane__eyebrow" id="form-mode">편집</p>
+                <h2 id="form-title">할일을 선택하세요</h2>
+              </div>
+            </header>
+            <input type="hidden" id="todo-id" />
+
+            <div class="field">
+              <label for="title">업무</label>
+              <input id="title" type="text" placeholder="무엇을 할까요?" />
+            </div>
+
+            <div class="editor-grid">
+              <div class="field">
+                <label for="type">구분</label>
+                <select id="type"></select>
+              </div>
+              <div class="field">
+                <label for="date">날짜</label>
+                <input id="date" type="date" />
+              </div>
+              <div class="field">
+                <label for="category">카테고리</label>
+                <input id="category" type="text" placeholder="예: 프로모션" />
+              </div>
+              <div class="field">
+                <label for="priority">우선순위</label>
+                <select id="priority">
+                  <option>높음</option>
+                  <option selected>중간</option>
+                  <option>낮음</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label id="progress-field-label" for="progress-range">진행률 <span class="field-live" id="progress-label">0%</span></label>
+              <div class="progress-edit">
+                <input
+                  id="progress-range"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value="0"
+                  aria-labelledby="progress-field-label"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                />
+                <input id="progress" type="number" min="0" max="100" step="5" value="0" aria-label="진행률 %" />
+              </div>
+              <div class="derived-row">
+                <span class="badge badge--derived">표시 <strong id="display-preview">1</strong></span>
+                <span class="badge badge--derived">상태 <strong id="status-preview">시작전</strong></span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="note">비고</label>
+              <textarea id="note" rows="3" placeholder="선택 메모"></textarea>
+            </div>
+
+            <div class="form-actions editor-actions">
+              <button type="submit" class="btn btn--primary" id="btn-save">저장</button>
+              <button type="button" class="btn" id="btn-delete">삭제</button>
+              <!-- <a class="btn btn--ghost" id="link-cal" href="calendar.html">달력</a> -->
+            </div>
+          </form>
+        </aside>
+      </div>
+    </main>
+    <script src="js/store.js"></script>
+    <script>
+      (function () {
+        var d = new URLSearchParams(location.search).get("date");
+        if (d && window.DeskList) {
+          window.DeskList.setFilterGroup("dates", [d]);
+        }
+      })();
+    </script>
+    <script src="js/todos-page.js"></script>
+  </body>
+</html>

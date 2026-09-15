@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>만다라트 · DeskList 목업</title>
+    <link rel="stylesheet" href="css/mock.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="index.html">Desk<span>List</span></a>
+        <nav class="nav" aria-label="주요">
+          <a href="calendar.html">달력</a>
+          <a href="todos.html">할일</a>
+          <a href="mandalart.html" aria-current="page">만다라트</a>
+          <a href="settings.html">설정</a>
+        </nav>
+      </div>
+    </header>
+    <main class="main">
+      <div class="mandala-layout">
+        <aside class="mandala-aside">
+          <h1>Mandala Goal Chart</h1>
+          <div class="mandala-quote">Visualize your goals,<br />design your future</div>
+          <div class="mandala-deco" aria-hidden="true"></div>
+          <p class="note" style="margin-top: 2rem">
+            중앙 <strong>세부 목표</strong>를 수정하면 외곽이 미러됩니다.
+            입력 내용은 <strong>자동 저장</strong>됩니다 (localStorage).
+          </p>
+          <p class="hint-inline" id="mandala-save-status" hidden>저장됨</p>
+          <div class="mandala-actions">
+            <button type="button" class="btn btn--primary" id="send-todo" disabled>
+              선택 칸 → 할일로 보내기
+            </button>
+            <p class="hint-inline" id="send-msg" hidden></p>
+            <button type="button" class="btn" id="mandala-reset">만다라트 샘플로 초기화</button>
+            <a class="btn" href="todos.html">할일 화면으로</a>
+          </div>
+        </aside>
+        <div class="m9" role="grid" aria-label="만다라트 9x9" id="mandala-grid">
+            <input class="b0" value="키워드 조사" aria-label="0,0" />
+            <input class="b0" value="초안 작성" aria-label="0,1" />
+            <input class="b0" value="교정" aria-label="0,2" />
+            <input class="b1" value="촬영 리스트" aria-label="0,3" />
+            <input class="b1" value="조명 세팅" aria-label="0,4" />
+            <input class="b1" value="컷 편집" aria-label="0,5" />
+            <input class="b2" value="채널 분석" aria-label="0,6" />
+            <input class="b2" value="썸네일 A/B" aria-label="0,7" />
+            <input class="b2" value="발행 캘린더" aria-label="0,8" />
+            <input class="b0" value="레퍼런스" aria-label="1,0" />
+            <input class="mirror b0 mirror-linked" data-mirror="nw" readonly value="콘텐츠 루틴" aria-label="1,1 미러" />
+            <input class="b0 active-piece" value="주 3회 발행" aria-label="1,2" />
+            <input class="b1" value="콘티" aria-label="1,3" />
+            <input class="mirror b1 mirror-linked" data-mirror="n" readonly value="영상 제작" aria-label="1,4 미러" />
+            <input class="b1" value="자막" aria-label="1,5" />
+            <input class="b2" value="SEO 체크" aria-label="1,6" />
+            <input class="mirror b2 mirror-linked" data-mirror="ne" readonly value="배포·성장" aria-label="1,7 미러" />
+            <input class="b2" value="커뮤니티" aria-label="1,8" />
+            <input class="b0" value="피드백" aria-label="2,0" />
+            <input class="b0" value="아카이브" aria-label="2,1" />
+            <input class="b0" value="아이디어 노트" aria-label="2,2" />
+            <input class="b1" value="B-roll" aria-label="2,3" />
+            <input class="b1" value="사운드" aria-label="2,4" />
+            <input class="b1" value="썸네일" aria-label="2,5" />
+            <input class="b2" value="협업 문의" aria-label="2,6" />
+            <input class="b2" value="지표 리뷰" aria-label="2,7" />
+            <input class="b2" value="실험 로그" aria-label="2,8" />
+            <input class="b3" value="주간 계획" aria-label="3,0" />
+            <input class="b3" value="시간 블록" aria-label="3,1" />
+            <input class="b3" value="방해 차단" aria-label="3,2" />
+            <input class="sub-c" data-src="nw" value="콘텐츠 루틴" aria-label="3,3 세부" />
+            <input class="sub-c" data-src="n" value="영상 제작" aria-label="3,4 세부" />
+            <input class="sub-c" data-src="ne" value="배포·성장" aria-label="3,5 세부" />
+            <input class="b4" value="제품 로드맵" aria-label="3,6" />
+            <input class="b4" value="고객 인터뷰" aria-label="3,7" />
+            <input class="b4" value="프로토타입" aria-label="3,8" />
+            <input class="b3" value="우선순위" aria-label="4,0" />
+            <input class="mirror b3 mirror-linked" data-mirror="w" readonly value="집중력" aria-label="4,1 미러" />
+            <input class="b3" value="회고" aria-label="4,2" />
+            <input class="sub-c" data-src="w" value="집중력" aria-label="4,3 세부" />
+            <input class="core" value="퍼스널 브랜드" aria-label="4,4 핵심" />
+            <input class="sub-c" data-src="e" value="제품 실험" aria-label="4,5 세부" />
+            <input class="b4" value="가설 검증" aria-label="4,6" />
+            <input class="mirror b4 mirror-linked" data-mirror="e" readonly value="제품 실험" aria-label="4,7 미러" />
+            <input class="b4" value="출시 노트" aria-label="4,8" />
+            <input class="b3" value="딥워크" aria-label="5,0" />
+            <input class="b3" value="휴식 리듬" aria-label="5,1" />
+            <input class="b3" value="도구 정리" aria-label="5,2" />
+            <input class="sub-c" data-src="sw" value="네트워킹" aria-label="5,3 세부" />
+            <input class="sub-c" data-src="s" value="건강·에너지" aria-label="5,4 세부" />
+            <input class="sub-c" data-src="se" value="수익 모델" aria-label="5,5 세부" />
+            <input class="b4" value="피드백 루프" aria-label="5,6" />
+            <input class="b4" value="문서화" aria-label="5,7" />
+            <input class="b4" value="회고 미팅" aria-label="5,8" />
+            <input class="b5" value="커피챗" aria-label="6,0" />
+            <input class="b5" value="커뮤니티" aria-label="6,1" />
+            <input class="b5" value="멘토링" aria-label="6,2" />
+            <input class="b6" value="수면" aria-label="6,3" />
+            <input class="b6" value="운동" aria-label="6,4" />
+            <input class="b6" value="식사" aria-label="6,5" />
+            <input class="b7" value="구독 상품" aria-label="6,6" />
+            <input class="b7" value="컨설팅" aria-label="6,7" />
+            <input class="b7" value="디지털 굿즈" aria-label="6,8" />
+            <input class="b5" value="소개 요청" aria-label="7,0" />
+            <input class="mirror b5 mirror-linked" data-mirror="sw" readonly value="네트워킹" aria-label="7,1 미러" />
+            <input class="b5" value="행사 참석" aria-label="7,2" />
+            <input class="b6" value="스트레칭" aria-label="7,3" />
+            <input class="mirror b6 mirror-linked" data-mirror="s" readonly value="건강·에너지" aria-label="7,4 미러" />
+            <input class="b6" value="산책" aria-label="7,5" />
+            <input class="b7" value="가격 실험" aria-label="7,6" />
+            <input class="mirror b7 mirror-linked" data-mirror="se" readonly value="수익 모델" aria-label="7,7 미러" />
+            <input class="b7" value="정산 정리" aria-label="7,8" />
+            <input class="b5" value="팔로업" aria-label="8,0" />
+            <input class="b5" value="명함/링크" aria-label="8,1" />
+            <input class="b5" value="감사 메시지" aria-label="8,2" />
+            <input class="b6" value="물 섭취" aria-label="8,3" />
+            <input class="b6" value="스크린 오프" aria-label="8,4" />
+            <input class="b6" value="주간 체크" aria-label="8,5" />
+            <input class="b7" value="리텐션" aria-label="8,6" />
+            <input class="b7" value="업셀" aria-label="8,7" />
+            <input class="b7" value="파트너십" aria-label="8,8" />
+        </div>
+      </div>
+    </main>
+    <script src="js/store.js"></script>
+    <script src="js/mandala-page.js"></script>
+  </body>
+</html>
