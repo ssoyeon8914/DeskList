@@ -50,7 +50,12 @@
       return;
     }
     if (e.target.classList.contains("btn-del")) {
-      if (!S.removeType(i)) alert("구분은 최소 1개 필요합니다.");
+      if (!S.removeType(i)) {
+        DLModal.alert({
+          title: "삭제 불가",
+          message: "구분은 최소 1개 필요합니다.",
+        });
+      }
     }
   });
 
@@ -59,7 +64,14 @@
   });
 
   document.getElementById("reset-seed").addEventListener("click", function () {
-    if (confirm("샘플 데이터로 초기화할까요? (할일·구분 포함)")) S.resetSeed();
+    DLModal.confirm({
+      title: "샘플 초기화",
+      message: "샘플 데이터로 초기화할까요? (할일·구분 포함)",
+      okLabel: "초기화",
+      danger: true,
+    }).then(function (ok) {
+      if (ok) S.resetSeed();
+    });
   });
 
   S.subscribe(render);

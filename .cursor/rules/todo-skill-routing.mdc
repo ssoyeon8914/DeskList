@@ -27,6 +27,8 @@ When the request matches a phase below, read and follow the matching project ski
 
 Always load `.cursor/skills/todo-workflow/constraints.md` and `excel-domain.md` for product work.
 
+**Mockup-first (post-MVP):** change `mockups/` → user confirms in browser → only then update `src/`. Do not touch React parity until confirm, unless the user explicitly says to edit code directly.
+
 Design anti-slop pack sources: `.cursor/skills/DESIGN-SKILLS.md`.
 
 Do not start deploy, ship, land-and-deploy, or canary work unless the user explicitly overrides later.

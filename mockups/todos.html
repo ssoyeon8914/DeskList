@@ -183,13 +183,15 @@
             </div>
 
             <div class="editor-grid">
-              <div class="field">
-                <label for="type">구분</label>
-                <select id="type"></select>
-              </div>
-              <div class="field">
-                <label for="date">날짜</label>
-                <input id="date" type="date" />
+              <div class="editor-row editor-row--2">
+                <div class="field">
+                  <label for="type">구분</label>
+                  <select id="type"></select>
+                </div>
+                <div class="field">
+                  <label for="date">날짜</label>
+                  <input id="date" type="date" />
+                </div>
               </div>
               <div class="field">
                 <label for="category">카테고리</label>
@@ -243,6 +245,7 @@
       </div>
     </main>
     <script src="js/store.js"></script>
+    <script src="js/modal.js"></script>
     <script>
       (function () {
         var d = new URLSearchParams(location.search).get("date");

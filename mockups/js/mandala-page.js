@@ -103,10 +103,17 @@
   var resetBtn = document.getElementById("mandala-reset");
   if (resetBtn) {
     resetBtn.addEventListener("click", function () {
-      if (!confirm("만다라트를 샘플 내용으로 되돌릴까요?")) return;
-      S.setMandala(S.seedMandala());
-      applyFromStore();
-      markSaved();
+      DLModal.confirm({
+        title: "만다라트 초기화",
+        message: "만다라트를 샘플 내용으로 되돌릴까요?",
+        okLabel: "초기화",
+        danger: true,
+      }).then(function (ok) {
+        if (!ok) return;
+        S.setMandala(S.seedMandala());
+        applyFromStore();
+        markSaved();
+      });
     });
   }
 

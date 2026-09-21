@@ -29,7 +29,8 @@ description: >-
 | 3d HTML lock | `todo-design-html` | Design approved → HTML/CSS |
 | 4 Architecture | `todo-plan-eng-review` | Lock data model + lean modules |
 | 4b Flow diagram | `todo-diagram` | Only if flow is unclear |
-| 5 Code | (implement per locked spec) | After eng + design lock |
+| 5 Mockup delta | edit `mockups/` only | Post-MVP changes: mock → user confirm |
+| 5b Code | (implement to match mock) | Only after user confirms mockup |
 | 6 QA report | `todo-qa-only` | Test, do not fix |
 | 6b Debug | `todo-investigate` | Bugs with root cause first |
 | 6c Visual polish | `todo-design-review` | After UI exists |
@@ -42,7 +43,7 @@ todo-office-hours
   → todo-design-consultation
   → todo-plan-design-review   (if plan includes UI)
   → todo-plan-eng-review
-  → implement
+  → mockups/ change → user confirm → src/ parity
   → todo-qa-only
   → todo-investigate          (only if bugs)
   → todo-design-review

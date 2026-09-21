@@ -319,7 +319,8 @@
     document.getElementById("title").value = todo.title;
     setProgress(todo.progress);
     document.getElementById("note").value = todo.note || "";
-    document.getElementById("link-cal").href = "calendar.html";
+    var linkCal = document.getElementById("link-cal");
+    if (linkCal) linkCal.href = "calendar.html";
   }
 
   function render() {
@@ -445,10 +446,45 @@
   document.getElementById("btn-delete").addEventListener("click", function () {
     var id = document.getElementById("todo-id").value;
     if (!id) return;
-    if (confirm("이 할일을 삭제할까요? (목업·로컬)")) S.deleteTodo(id);
+    DLModal.confirm({
+      title: "할일 삭제",
+      message: "이 할일을 삭제할까요? (목업·로컬)",
+      okLabel: "삭제",
+      danger: true,
+    }).then(function (ok) {
+      if (ok) S.deleteTodo(id);
+    });
   });
 
-  S.subscribe(render);
+  function syncListPaneHeight() {
+    var workspace = document.querySelector(".todos-workspace");
+    var editor = document.querySelector(".editor-pane");
+    if (!workspace || !editor) return;
+    if (window.matchMedia("(max-width: 960px)").matches) {
+      workspace.style.removeProperty("--todos-editor-h");
+      return;
+    }
+    var h = Math.round(editor.getBoundingClientRect().height);
+    if (h > 0) workspace.style.setProperty("--todos-editor-h", h + "px");
+  }
+
+  function renderAll() {
+    render();
+    requestAnimationFrame(syncListPaneHeight);
+  }
+
+  S.subscribe(renderAll);
+
+  (function bindListPaneHeight() {
+    var editor = document.querySelector(".editor-pane");
+    if (!editor || typeof ResizeObserver === "undefined") return;
+    var ro = new ResizeObserver(function () {
+      syncListPaneHeight();
+    });
+    ro.observe(editor);
+    window.addEventListener("resize", syncListPaneHeight);
+    syncListPaneHeight();
+  })();
 
   (function initWeekFilter() {
     var deep = new URLSearchParams(location.search).get("date");
@@ -456,5 +492,5 @@
     S.applyWeekDateFilter();
   })();
 
-  render();
+  renderAll();
 })();
