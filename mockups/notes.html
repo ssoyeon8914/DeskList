@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>노트 · DeskList 목업</title>
+    <link rel="stylesheet" href="css/mock.css?v=20260922b" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="index.html">Desk<span>List</span></a>
+        <nav class="nav" aria-label="주요">
+          <a href="calendar.html">달력</a>
+          <a href="todos.html">할일</a>
+          <a href="mandalart.html">만다라트</a>
+          <a href="memos.html">메모</a>
+          <a href="notes.html" aria-current="page">노트</a>
+          <a href="settings.html">설정</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main main--notes">
+      <div class="page-head page-head--notes">
+        <div>
+          <h1>노트</h1>
+          <p>
+            폴더로 묶어 긴 글을 기록합니다. Markdown은 편집과 프리뷰를 나란히 봅니다.<br />
+            <span class="field-hint">자동 저장 · 마지막 선택 기억 · localStorage</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="notes-shell" aria-label="노트 3단" id="notes-shell">
+        <aside class="notes-col notes-col--folders" id="notes-col-folders">
+          <div class="notes-col__head">
+            <div class="notes-col__head-start">
+              <button
+                type="button"
+                class="notes-col__toggle"
+                id="notes-toggle-folders"
+                aria-expanded="true"
+                aria-controls="notes-folders"
+                title="폴더 접기"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                  <path
+                    d="M8.5 3.25 4.75 7 8.5 10.75"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.35"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <span class="visually-hidden">폴더 접기</span>
+              </button>
+              <span class="notes-col__label">폴더</span>
+            </div>
+            <button type="button" class="btn btn--ghost notes-col__add" id="notes-add-folder">
+              + 폴더
+            </button>
+          </div>
+          <div id="notes-folders"></div>
+        </aside>
+
+        <section class="notes-col notes-col--titles" id="notes-col-titles">
+          <div class="notes-col__head">
+            <div class="notes-col__head-start">
+              <button
+                type="button"
+                class="notes-col__toggle"
+                id="notes-toggle-titles"
+                aria-expanded="true"
+                aria-controls="notes-titles"
+                title="노트 목록 접기"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                  <path
+                    d="M8.5 3.25 4.75 7 8.5 10.75"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.35"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <span class="visually-hidden">노트 목록 접기</span>
+              </button>
+              <span class="notes-col__label">노트</span>
+            </div>
+            <div class="notes-col__add-group">
+              <button type="button" class="btn btn--ghost notes-col__add" id="notes-add-txt">
+                + txt
+              </button>
+              <button type="button" class="btn btn--ghost notes-col__add" id="notes-add-md">
+                + md
+              </button>
+            </div>
+          </div>
+          <div id="notes-titles"></div>
+        </section>
+
+        <section class="notes-col notes-col--editor" id="notes-editor"></section>
+      </div>
+    </main>
+
+    <script src="js/holiday-seed.js?v=20260922b"></script>
+    <script src="js/store.js?v=20260922b"></script>
+    <script src="js/modal.js?v=20260922b"></script>
+    <script src="js/notes-md.js?v=20260922b"></script>
+    <script src="js/notes-page.js?v=20260922b"></script>
+  </body>
+</html>

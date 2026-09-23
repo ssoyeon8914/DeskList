@@ -9,6 +9,213 @@
       .replace(/"/g, "&quot;");
   }
 
+  function addDaysIso(iso, delta) {
+    var d = S.parseDate(iso);
+    d.setDate(d.getDate() + delta);
+    return S.formatDate(d);
+  }
+
+  function getScheduleMode() {
+    var field = document.getElementById("date-field");
+    return (field && field.getAttribute("data-mode")) || "single";
+  }
+
+  function daySpanCount(startIso, endIso) {
+    var d1 = S.parseDate(startIso);
+    var d2 = S.parseDate(endIso);
+    return Math.round((d2 - d1) / 86400000) + 1;
+  }
+
+  function getSelectedWeekdays() {
+    var picks = document.getElementById("weekday-picks");
+    if (!picks) return [];
+    return Array.prototype.slice
+      .call(picks.querySelectorAll('button[aria-pressed="true"]'))
+      .map(function (btn) {
+        return Number(btn.getAttribute("data-day"));
+      })
+      .filter(function (n) {
+        return n >= 0 && n <= 6;
+      })
+      .sort(function (a, b) {
+        return a - b;
+      });
+  }
+
+  function setSelectedWeekdays(days) {
+    var picks = document.getElementById("weekday-picks");
+    if (!picks) return;
+    var set = {};
+    (days || []).forEach(function (d) {
+      set[d] = true;
+    });
+    picks.querySelectorAll("button[data-day]").forEach(function (btn) {
+      var on = Boolean(set[Number(btn.getAttribute("data-day"))]);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function updateDateSummary() {
+    var summary = document.getElementById("date-summary");
+    var startEl = document.getElementById("date-start");
+    var endEl = document.getElementById("date-end");
+    if (!summary || !startEl || !startEl.value) {
+      if (summary) summary.hidden = true;
+      return;
+    }
+    var mode = getScheduleMode();
+    if (mode === "single") {
+      summary.hidden = true;
+      return;
+    }
+    var end = endEl && endEl.value ? endEl.value : startEl.value;
+    if (end < startEl.value) end = startEl.value;
+    summary.hidden = false;
+    if (mode === "recur") {
+      var days = getSelectedWeekdays();
+      if (!days.length) {
+        summary.textContent = "요일을 하나 이상 선택하세요";
+        return;
+      }
+      summary.textContent =
+        "매주 " +
+        S.weekdayNames(days) +
+        " · " +
+        S.dateLabel(startEl.value) +
+        " – " +
+        S.dateLabel(end);
+      return;
+    }
+    summary.textContent =
+      S.dateRangeLabel({ dateStart: startEl.value, dateEnd: end }) +
+      " · " +
+      daySpanCount(startEl.value, end) +
+      "일";
+  }
+
+  function setScheduleMode(mode, opts) {
+    opts = opts || {};
+    var field = document.getElementById("date-field");
+    var endSlot = document.getElementById("date-end-slot");
+    var sep = document.getElementById("date-sep");
+    var recurPanel = document.getElementById("recur-panel");
+    var startSub = document.getElementById("date-start-sub");
+    var endSub = document.getElementById("date-end-sub");
+    var startEl = document.getElementById("date-start");
+    var endEl = document.getElementById("date-end");
+    var btnSingle = document.getElementById("mode-single");
+    var btnRange = document.getElementById("mode-range");
+    var btnRecur = document.getElementById("mode-recur");
+    if (!field || !startEl || !endEl) return;
+
+    if (mode !== "single" && mode !== "range" && mode !== "recur") mode = "single";
+    field.setAttribute("data-mode", mode);
+    field.classList.toggle("is-range", mode === "range");
+    field.classList.toggle("is-recur", mode === "recur");
+
+    if (btnSingle) btnSingle.setAttribute("aria-pressed", mode === "single" ? "true" : "false");
+    if (btnRange) btnRange.setAttribute("aria-pressed", mode === "range" ? "true" : "false");
+    if (btnRecur) btnRecur.setAttribute("aria-pressed", mode === "recur" ? "true" : "false");
+
+    if (mode === "single") {
+      if (endSlot) endSlot.hidden = true;
+      if (sep) sep.hidden = true;
+      if (recurPanel) recurPanel.hidden = true;
+      if (startSub) startSub.textContent = "날짜";
+      endEl.value = startEl.value;
+    } else if (mode === "range") {
+      if (endSlot) endSlot.hidden = false;
+      if (sep) sep.hidden = false;
+      if (recurPanel) recurPanel.hidden = true;
+      if (startSub) startSub.textContent = "시작";
+      if (endSub) endSub.textContent = "종료";
+      endEl.value =
+        opts.endIso ||
+        (endEl.value && endEl.value > startEl.value
+          ? endEl.value
+          : addDaysIso(startEl.value || S.formatDate(new Date()), 1));
+      if (endEl.value < startEl.value) endEl.value = startEl.value;
+    } else {
+      if (endSlot) endSlot.hidden = false;
+      if (sep) sep.hidden = false;
+      if (recurPanel) recurPanel.hidden = false;
+      if (startSub) startSub.textContent = "시작";
+      if (endSub) endSub.textContent = "까지";
+      if (opts.weekdays) setSelectedWeekdays(opts.weekdays);
+      else if (!getSelectedWeekdays().length) setSelectedWeekdays([1, 2, 3, 4, 5]);
+      endEl.value =
+        opts.endIso ||
+        (endEl.value && endEl.value > startEl.value
+          ? endEl.value
+          : addDaysIso(startEl.value || S.formatDate(new Date()), 28));
+      if (endEl.value < startEl.value) endEl.value = startEl.value;
+    }
+    updateDateSummary();
+  }
+
+  function syncEndFromStart() {
+    var startEl = document.getElementById("date-start");
+    var endEl = document.getElementById("date-end");
+    if (!startEl || !endEl) return;
+    var mode = getScheduleMode();
+    if (mode === "single") {
+      endEl.value = startEl.value;
+    } else if (endEl.value < startEl.value) {
+      endEl.value = startEl.value;
+    }
+    updateDateSummary();
+  }
+
+  function rangeTitleVisible(t, iso, colIndex) {
+    if (!S.isRangeTodo(t)) return true;
+    if (iso === t.dateStart) return true;
+    /* 주가 바뀌는 첫 칸에도 제목 */
+    if (colIndex === 0 && S.todoCoversDate(t, iso)) return true;
+    return false;
+  }
+
+  function renderRangeBar(t, iso, colIndex) {
+    var seg = S.rangeSegment(t, iso);
+    if (!seg) return "";
+    var showTitle = rangeTitleVisible(t, iso, colIndex);
+    var done = t.progress >= 100 ? " range-bar--done" : "";
+    return (
+      '<div class="range-bar range-bar--' +
+      seg +
+      done +
+      '" data-level="' +
+      t.display +
+      '" title="' +
+      esc(S.dateRangeLabel(t) + " · " + t.title) +
+      '">' +
+      (showTitle
+        ? '<span class="range-bar__icon">' +
+          S.iconFor(t.type) +
+          '</span><span class="range-bar__title">' +
+          esc(t.title) +
+          "</span>"
+        : "") +
+      "</div>"
+    );
+  }
+
+  function renderDayChip(t) {
+    var recurMark = S.isRecurTodo(t) ? '<span class="day-chip__recur" title="반복">↻</span> ' : "";
+    return (
+      '<div class="day-chip' +
+      (t.progress >= 100 ? " day-chip--done" : "") +
+      (S.isRecurTodo(t) ? " day-chip--recur" : "") +
+      '" title="' +
+      esc(t.title) +
+      '">' +
+      recurMark +
+      S.iconFor(t.type) +
+      " " +
+      esc(t.title) +
+      "</div>"
+    );
+  }
+
   function renderWeek(state) {
     var wrap = document.getElementById("week-panel");
     if (!wrap) return;
@@ -54,17 +261,19 @@
       })
       .join("");
     var bodyHtml = cells
-      .map(function (c) {
+      .map(function (c, colIndex) {
         var items = list.filter(function (t) {
-          return t.date === c.date;
+          return S.todoCoversDate(t, c.date);
         });
         var lines = items
-          .slice(0, 3)
+          .slice(0, 4)
           .map(function (t) {
-            return S.iconFor(t.type) + " " + esc(t.title);
+            return S.isRangeTodo(t) ? renderRangeBar(t, c.date, colIndex) : renderDayChip(t);
           })
-          .join("<br />");
-        if (items.length > 3) lines += "<br /><span class='badge-num'>+" + (items.length - 3) + "</span>";
+          .join("");
+        if (items.length > 4) {
+          lines += '<span class="badge-num">+' + (items.length - 4) + "</span>";
+        }
         var muted = c.inMonth ? "" : " style='opacity:.45'";
         var selCls = " wc--on";
         if (!fullWeek) {
@@ -74,18 +283,27 @@
             selCls = " wc--off";
           }
         }
+        var holiday = S.holidayOn(c.date);
+        var dow = S.parseDate(c.date).getDay();
+        var holCls = holiday ? " wc--holiday" : "";
+        if (dow === 0) holCls += " wc--sun";
+        if (dow === 6) holCls += " wc--sat";
         return (
           '<div class="wc' +
           selCls +
+          holCls +
           '"' +
           muted +
           ' data-date="' +
           c.date +
-          '" role="button" tabindex="0" title="클릭: 이 날만 · 같은 날 다시: 주 전체">' +
+          '" role="button" tabindex="0" title="' +
+          (holiday ? holiday.name + " · " : "") +
+          '클릭: 이 날만 · 같은 날 다시: 주 전체">' +
           "<strong>" +
           c.day +
           "</strong>" +
-          (lines || "") +
+          (holiday ? '<span class="day__holiday">' + esc(holiday.name) + "</span>" : "") +
+          lines +
           "</div>"
         );
       })
@@ -221,7 +439,7 @@
           esc(t.type) +
           "</td>" +
           "<td>" +
-          esc(S.dateLabel(t.date)) +
+          esc(S.dateRangeLabel(t)) +
           "</td>" +
           "<td>" +
           esc(t.category) +
@@ -299,8 +517,11 @@
       var w = S.getState().week;
       var weekDays = S.weekDates(w.year, w.month, w.weekIndex, w.weekStartsOn);
       var dates = S.getState().filters.dates;
-      document.getElementById("date").value =
-        dates.length === 1 ? dates[0] : weekDays[0] || "2026-09-16";
+      var start = dates.length === 1 ? dates[0] : weekDays[0] || "2026-09-16";
+      document.getElementById("date-start").value = start;
+      document.getElementById("date-end").value = start;
+      setScheduleMode("single");
+      setSelectedWeekdays([1, 2, 3, 4, 5]);
       document.getElementById("category").value = "";
       document.getElementById("priority").value = "중간";
       document.getElementById("title").value = "";
@@ -313,7 +534,18 @@
     document.getElementById("form-title").textContent = todo.title || "(제목 없음)";
     document.getElementById("todo-id").value = todo.id;
     document.getElementById("type").value = todo.type;
-    document.getElementById("date").value = todo.date;
+    document.getElementById("date-start").value = todo.dateStart;
+    document.getElementById("date-end").value = todo.dateEnd;
+    if (S.isRecurTodo(todo)) {
+      setScheduleMode("recur", {
+        endIso: todo.dateEnd,
+        weekdays: todo.recur.weekdays.slice(),
+      });
+    } else if (S.isRangeTodo(todo)) {
+      setScheduleMode("range", { endIso: todo.dateEnd });
+    } else {
+      setScheduleMode("single");
+    }
     document.getElementById("category").value = todo.category;
     document.getElementById("priority").value = todo.priority;
     document.getElementById("title").value = todo.title;
@@ -431,10 +663,28 @@
 
   document.getElementById("form").addEventListener("submit", function (e) {
     e.preventDefault();
+    var mode = getScheduleMode();
+    var start = document.getElementById("date-start").value;
+    var end = mode === "single" ? start : document.getElementById("date-end").value;
+    if (!end || end < start) end = start;
+    var recur = null;
+    if (mode === "recur") {
+      var weekdays = getSelectedWeekdays();
+      if (!weekdays.length) {
+        DLModal.alert({
+          title: "반복 요일",
+          message: "반복할 요일을 하나 이상 선택해 주세요.",
+        });
+        return;
+      }
+      recur = { freq: "weekly", weekdays: weekdays };
+    }
     S.upsertTodo({
       id: document.getElementById("todo-id").value || undefined,
       type: document.getElementById("type").value,
-      date: document.getElementById("date").value,
+      dateStart: start,
+      dateEnd: end,
+      recur: recur,
       category: document.getElementById("category").value,
       priority: document.getElementById("priority").value,
       title: document.getElementById("title").value,
@@ -442,6 +692,51 @@
       note: document.getElementById("note").value,
     });
   });
+
+  var modeSingle = document.getElementById("mode-single");
+  if (modeSingle) {
+    modeSingle.addEventListener("click", function () {
+      setScheduleMode("single");
+    });
+  }
+  var modeRange = document.getElementById("mode-range");
+  if (modeRange) {
+    modeRange.addEventListener("click", function () {
+      setScheduleMode("range");
+    });
+  }
+  var modeRecur = document.getElementById("mode-recur");
+  if (modeRecur) {
+    modeRecur.addEventListener("click", function () {
+      setScheduleMode("recur");
+    });
+  }
+  var weekdayPicks = document.getElementById("weekday-picks");
+  if (weekdayPicks) {
+    weekdayPicks.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-day]");
+      if (!btn) return;
+      var on = btn.getAttribute("aria-pressed") === "true";
+      btn.setAttribute("aria-pressed", on ? "false" : "true");
+      updateDateSummary();
+    });
+  }
+  var dateStartEl = document.getElementById("date-start");
+  if (dateStartEl) {
+    dateStartEl.addEventListener("change", syncEndFromStart);
+  }
+  var dateEndEl = document.getElementById("date-end");
+  if (dateEndEl) {
+    dateEndEl.addEventListener("change", function () {
+      var startEl = document.getElementById("date-start");
+      if (startEl && dateEndEl.value < startEl.value) dateEndEl.value = startEl.value;
+      if (getScheduleMode() === "range" && startEl && dateEndEl.value === startEl.value) {
+        setScheduleMode("single");
+      } else {
+        updateDateSummary();
+      }
+    });
+  }
 
   document.getElementById("btn-delete").addEventListener("click", function () {
     var id = document.getElementById("todo-id").value;

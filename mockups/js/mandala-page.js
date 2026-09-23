@@ -86,7 +86,8 @@
     if (!selected || !selected.value.trim()) return;
     var created = S.upsertTodo({
       type: "할일",
-      date: "2026-09-16",
+      dateStart: "2026-09-16",
+      dateEnd: "2026-09-16",
       category: "만다라트",
       priority: "중간",
       title: selected.value.trim(),

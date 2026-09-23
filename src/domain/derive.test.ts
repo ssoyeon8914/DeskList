@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import { displayOf, statusOf, enrich } from "../domain/derive";
 import { matchesFilters } from "../domain/filter";
 import { monthCells } from "../domain/calendarGrid";
+import {
+  isRangeTodo,
+  isRecurTodo,
+  normalizeTodo,
+  todoCoversDate,
+} from "../domain/todoDates";
 import type { Filters, Todo } from "../domain/types";
 
 describe("derive", () => {
@@ -22,7 +28,8 @@ describe("derive", () => {
     const e = enrich({
       id: "1",
       type: "할일",
-      date: "2026-09-16",
+      dateStart: "2026-09-16",
+      dateEnd: "2026-09-16",
       category: "A",
       priority: "높음",
       title: "x",
@@ -34,11 +41,57 @@ describe("derive", () => {
   });
 });
 
+describe("todoDates", () => {
+  it("migrates legacy date field", () => {
+    const t = normalizeTodo({
+      id: "1",
+      type: "할일",
+      date: "2026-09-16",
+      category: "A",
+      priority: "중간",
+      title: "x",
+      progress: 0,
+      note: "",
+    });
+    expect(t.dateStart).toBe("2026-09-16");
+    expect(t.dateEnd).toBe("2026-09-16");
+  });
+
+  it("covers range and weekly recur", () => {
+    const range: Todo = {
+      id: "r",
+      type: "일정",
+      dateStart: "2026-09-15",
+      dateEnd: "2026-09-18",
+      category: "A",
+      priority: "높음",
+      title: "캠페인",
+      progress: 0,
+      note: "",
+    };
+    expect(isRangeTodo(range)).toBe(true);
+    expect(todoCoversDate(range, "2026-09-16")).toBe(true);
+    expect(todoCoversDate(range, "2026-09-19")).toBe(false);
+
+    const recur: Todo = {
+      ...range,
+      id: "w",
+      dateEnd: "2026-10-10",
+      recur: { freq: "weekly", weekdays: [1, 3, 5] },
+    };
+    expect(isRecurTodo(recur)).toBe(true);
+    expect(isRangeTodo(recur)).toBe(false);
+    expect(todoCoversDate(recur, "2026-09-16")).toBe(true); // Wed
+    expect(todoCoversDate(recur, "2026-09-15")).toBe(false); // Tue
+  });
+});
+
 describe("matchesFilters", () => {
   const todo: Todo = {
     id: "1",
     type: "할일",
-    date: "2026-09-16",
+    dateStart: "2026-09-16",
+    dateEnd: "2026-09-16",
     category: "프로모션",
     priority: "중간",
     title: "x",
@@ -62,9 +115,11 @@ describe("matchesFilters", () => {
     expect(matchesFilters(todo, { ...base, types: [] })).toBe(false);
   });
 
-  it("dates restrict", () => {
+  it("dates restrict with overlap", () => {
     expect(matchesFilters(todo, { ...base, dates: ["2026-09-17"] })).toBe(false);
     expect(matchesFilters(todo, { ...base, dates: ["2026-09-16"] })).toBe(true);
+    const ranged = { ...todo, dateStart: "2026-09-15", dateEnd: "2026-09-18" };
+    expect(matchesFilters(ranged, { ...base, dates: ["2026-09-17"] })).toBe(true);
   });
 });
 

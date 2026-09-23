@@ -1,7 +1,23 @@
 import { createSeed } from "./seed";
+import {
+  mergeHolidaySeed,
+  normalizeHoliday,
+  seedHolidays,
+} from "../domain/holidays";
+import { normalizeMemo, seedMemos } from "../domain/memos";
+import {
+  normalizeDoc,
+  normalizeFolder,
+  resolveDocsUi,
+  seedDocs,
+  seedDocsUi,
+  seedFolders,
+} from "../domain/notes";
+import { normalizeTodo } from "../domain/todoDates";
 import type { AppState } from "../domain/types";
 
-export const STORAGE_KEY = "desklist/v1";
+export const STORAGE_KEY = "desklist/v3";
+const LEGACY_KEYS = ["desklist/v2", "desklist/v1"];
 
 function normalize(raw: unknown): AppState {
   const seed = createSeed();
@@ -18,10 +34,47 @@ function normalize(raw: unknown): AppState {
         ? "mon"
         : "sun";
 
+  const todos = Array.isArray(o.todos)
+    ? o.todos.map((t) => normalizeTodo(t)).filter((t) => t.id)
+    : seed.todos;
+
+  const holidays = Array.isArray(o.holidays)
+    ? mergeHolidaySeed(
+        o.holidays
+          .map(normalizeHoliday)
+          .filter((h): h is NonNullable<typeof h> => Boolean(h)),
+      )
+    : seedHolidays();
+
+  const memos = Array.isArray(o.memos)
+    ? o.memos.map(normalizeMemo).filter((m): m is NonNullable<typeof m> => Boolean(m))
+    : seedMemos();
+
+  const docFolders = Array.isArray(o.docFolders)
+    ? o.docFolders
+        .map(normalizeFolder)
+        .filter((f): f is NonNullable<typeof f> => Boolean(f))
+    : seedFolders();
+
+  const folderIds = new Set(docFolders.map((f) => f.id));
+  const docs = Array.isArray(o.docs)
+    ? o.docs
+        .map(normalizeDoc)
+        .filter((d): d is NonNullable<typeof d> => Boolean(d))
+        .filter((d) => folderIds.has(d.folderId))
+    : seedDocs();
+
+  const docsUi = resolveDocsUi(docFolders, docs, o.docsUi ?? seedDocsUi());
+
   return {
-    version: 1,
+    version: 3,
     types: Array.isArray(o.types) && o.types.length ? o.types : seed.types,
-    todos: Array.isArray(o.todos) ? o.todos : seed.todos,
+    todos,
+    holidays,
+    memos,
+    docFolders,
+    docs,
+    docsUi,
     filters: o.filters
       ? {
           dates: o.filters.dates ?? [],
@@ -50,9 +103,17 @@ function normalize(raw: unknown): AppState {
 
 export function loadState(): AppState {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      for (const key of LEGACY_KEYS) {
+        raw = localStorage.getItem(key);
+        if (raw) break;
+      }
+    }
     if (!raw) return createSeed();
-    return normalize(JSON.parse(raw));
+    const state = normalize(JSON.parse(raw));
+    saveState(state);
+    return state;
   } catch {
     return createSeed();
   }
@@ -60,4 +121,40 @@ export function loadState(): AppState {
 
 export function saveState(state: AppState): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+/** Pretty JSON of the current persisted blob (for backup / port migrate). */
+export function exportStateJson(): string {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try {
+      return JSON.stringify(JSON.parse(raw), null, 2);
+    } catch {
+      return raw;
+    }
+  }
+  return JSON.stringify(createSeed(), null, 2);
+}
+
+/** Validate + write JSON, then return normalized AppState. */
+export function importStateJson(json: string): AppState {
+  const parsed = JSON.parse(json) as unknown;
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("유효한 JSON 객체가 아닙니다.");
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+  return loadState();
+}
+
+export function downloadStateBackup(): void {
+  const blob = new Blob([exportStateJson()], {
+    type: "application/json;charset=utf-8",
+  });
+  const a = document.createElement("a");
+  const d = new Date();
+  const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  a.href = URL.createObjectURL(blob);
+  a.download = `desklist-backup-${stamp}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }

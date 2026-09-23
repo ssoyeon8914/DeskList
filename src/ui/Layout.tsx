@@ -4,6 +4,8 @@ const links = [
   { to: "/calendar", label: "달력" },
   { to: "/todos", label: "할일" },
   { to: "/mandalart", label: "만다라트" },
+  { to: "/memos", label: "메모" },
+  { to: "/notes", label: "노트" },
   { to: "/settings", label: "설정" },
 ] as const;
 

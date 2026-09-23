@@ -1,9 +1,15 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { dateLabel, weekDates } from "../../domain/calendarGrid";
+import { weekDates } from "../../domain/calendarGrid";
 import { displayOf, statusOf } from "../../domain/derive";
 import { allCategories, filteredTodos } from "../../domain/filter";
-import type { Priority } from "../../domain/types";
+import {
+  addDaysIso,
+  dateRangeLabel,
+  isRecurTodo,
+  isRangeTodo,
+} from "../../domain/todoDates";
+import type { Priority, ScheduleMode, Todo } from "../../domain/types";
 import {
   applyWeekDateFilter,
   deleteTodo,
@@ -22,7 +28,10 @@ import { WeekPanel } from "./WeekPanel";
 type FormState = {
   id: string;
   type: string;
-  date: string;
+  dateStart: string;
+  dateEnd: string;
+  mode: ScheduleMode;
+  weekdays: number[];
   category: string;
   priority: Priority;
   title: string;
@@ -30,17 +39,29 @@ type FormState = {
   note: string;
 };
 
+const DEFAULT_WEEKDAYS = [1, 2, 3, 4, 5];
+const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
+
 function emptyForm(defaultType: string, defaultDate: string): FormState {
   return {
     id: "",
     type: defaultType,
-    date: defaultDate,
+    dateStart: defaultDate,
+    dateEnd: defaultDate,
+    mode: "single",
+    weekdays: DEFAULT_WEEKDAYS.slice(),
     category: "",
     priority: "중간",
     title: "",
     progress: 0,
     note: "",
   };
+}
+
+function modeFromTodo(todo: Todo): ScheduleMode {
+  if (isRecurTodo(todo)) return "recur";
+  if (isRangeTodo(todo)) return "range";
+  return "single";
 }
 
 export function TodosPage() {
@@ -91,7 +112,7 @@ export function TodosPage() {
       ro.disconnect();
       window.removeEventListener("resize", syncHeight);
     };
-  }, [creating, form.id]);
+  }, [creating, form.id, form.mode]);
 
   useEffect(() => {
     const d = searchParams.get("date");
@@ -107,7 +128,10 @@ export function TodosPage() {
     setForm({
       id: sel.id,
       type: sel.type,
-      date: sel.date,
+      dateStart: sel.dateStart,
+      dateEnd: sel.dateEnd,
+      mode: modeFromTodo(sel),
+      weekdays: sel.recur?.weekdays?.slice() || DEFAULT_WEEKDAYS.slice(),
       category: sel.category,
       priority: sel.priority,
       title: sel.title,
@@ -120,6 +144,33 @@ export function TodosPage() {
     setForm((f) => ({ ...f, ...patch }));
   }
 
+  function setMode(mode: ScheduleMode) {
+    setForm((f) => {
+      if (mode === "single") {
+        return { ...f, mode, dateEnd: f.dateStart };
+      }
+      if (mode === "range") {
+        const end =
+          f.dateEnd > f.dateStart ? f.dateEnd : addDaysIso(f.dateStart, 1);
+        return { ...f, mode, dateEnd: end };
+      }
+      const end =
+        f.dateEnd > f.dateStart ? f.dateEnd : addDaysIso(f.dateStart, 28);
+      const weekdays = f.weekdays.length ? f.weekdays : DEFAULT_WEEKDAYS.slice();
+      return { ...f, mode, dateEnd: end, weekdays };
+    });
+  }
+
+  function toggleWeekday(day: number) {
+    setForm((f) => {
+      const on = f.weekdays.includes(day);
+      const weekdays = on
+        ? f.weekdays.filter((d) => d !== day)
+        : [...f.weekdays, day].sort((a, b) => a - b);
+      return { ...f, weekdays };
+    });
+  }
+
   function startNew() {
     selectTodo(null);
     setCreating(true);
@@ -128,10 +179,27 @@ export function TodosPage() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
+    const start = form.dateStart;
+    let end = form.mode === "single" ? start : form.dateEnd;
+    if (!end || end < start) end = start;
+
+    if (form.mode === "recur" && !form.weekdays.length) {
+      void DLModal.alert({
+        title: "반복 요일",
+        message: "반복할 요일을 하나 이상 선택해 주세요.",
+      });
+      return;
+    }
+
     upsertTodo({
       id: form.id || undefined,
       type: form.type,
-      date: form.date,
+      dateStart: start,
+      dateEnd: end,
+      recur:
+        form.mode === "recur"
+          ? { freq: "weekly", weekdays: form.weekdays }
+          : null,
       category: form.category,
       priority: form.priority,
       title: form.title,
@@ -157,6 +225,24 @@ export function TodosPage() {
   }
 
   const isEmpty = creating || !form.id;
+
+  const summaryText = useMemo(() => {
+    if (form.mode === "single" || !form.dateStart) return "";
+    const end = form.dateEnd >= form.dateStart ? form.dateEnd : form.dateStart;
+    if (form.mode === "recur") {
+      if (!form.weekdays.length) return "요일을 하나 이상 선택하세요";
+      return dateRangeLabel({
+        dateStart: form.dateStart,
+        dateEnd: end,
+        recur: { freq: "weekly", weekdays: form.weekdays },
+      });
+    }
+    const days =
+      Math.round(
+        (new Date(end).getTime() - new Date(form.dateStart).getTime()) / 86400000,
+      ) + 1;
+    return `${dateRangeLabel({ dateStart: form.dateStart, dateEnd: end })} · ${days}일`;
+  }, [form.mode, form.dateStart, form.dateEnd, form.weekdays]);
 
   return (
     <main className="main">
@@ -246,7 +332,7 @@ export function TodosPage() {
               <thead>
                 <tr>
                   <th>구분</th>
-                  <th>날짜</th>
+                  <th>기간</th>
                   <th>카테고리</th>
                   <th>우선순위</th>
                   <th title="우선순위 파생 1/2/3">표시</th>
@@ -275,7 +361,7 @@ export function TodosPage() {
                       }}
                     >
                       <td>{t.type}</td>
-                      <td>{dateLabel(t.date)}</td>
+                      <td>{dateRangeLabel(t)}</td>
                       <td>{t.category}</td>
                       <td>{t.priority}</td>
                       <td>
@@ -325,31 +411,132 @@ export function TodosPage() {
             </div>
 
             <div className="editor-grid">
-              <div className="editor-row editor-row--2">
-                <div className="field">
-                  <label htmlFor="todo-type">구분</label>
-                  <select
-                    id="todo-type"
-                    value={form.type}
-                    onChange={(e) => patchForm({ type: e.target.value })}
-                  >
-                    {state.types.map((t) => (
-                      <option key={t.name} value={t.name}>
-                        {t.icon} {t.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="field">
-                  <label htmlFor="todo-date">날짜</label>
-                  <input
-                    id="todo-date"
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => patchForm({ date: e.target.value })}
-                  />
-                </div>
+              <div className="field field--type">
+                <label htmlFor="todo-type">구분</label>
+                <select
+                  id="todo-type"
+                  value={form.type}
+                  onChange={(e) => patchForm({ type: e.target.value })}
+                >
+                  {state.types.map((t) => (
+                    <option key={t.name} value={t.name}>
+                      {t.icon} {t.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+
+              <div className="date-field" data-mode={form.mode}>
+                <div className="date-field__head">
+                  <span className="date-field__title">일정</span>
+                  <div className="seg date-field__mode" role="group" aria-label="일정 유형">
+                    <button
+                      type="button"
+                      aria-pressed={form.mode === "single"}
+                      onClick={() => setMode("single")}
+                    >
+                      하루
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={form.mode === "range"}
+                      onClick={() => setMode("range")}
+                    >
+                      기간
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={form.mode === "recur"}
+                      onClick={() => setMode("recur")}
+                    >
+                      반복
+                    </button>
+                  </div>
+                </div>
+                <div className="date-field__inputs">
+                  <div className="date-field__slot date-field__slot--start">
+                    <label className="date-field__sub" htmlFor="todo-date-start">
+                      {form.mode === "single" ? "날짜" : "시작"}
+                    </label>
+                    <input
+                      id="todo-date-start"
+                      type="date"
+                      aria-label={form.mode === "single" ? "날짜" : "시작일"}
+                      value={form.dateStart}
+                      onChange={(e) => {
+                        const dateStart = e.target.value;
+                        setForm((f) => {
+                          if (f.mode === "single") {
+                            return { ...f, dateStart, dateEnd: dateStart };
+                          }
+                          const dateEnd = f.dateEnd < dateStart ? dateStart : f.dateEnd;
+                          return { ...f, dateStart, dateEnd };
+                        });
+                      }}
+                    />
+                  </div>
+                  {form.mode !== "single" && (
+                    <>
+                      <span className="date-field__sep" aria-hidden="true">
+                        →
+                      </span>
+                      <div className="date-field__slot date-field__slot--end">
+                        <label className="date-field__sub" htmlFor="todo-date-end">
+                          {form.mode === "recur" ? "까지" : "종료"}
+                        </label>
+                        <input
+                          id="todo-date-end"
+                          type="date"
+                          aria-label={form.mode === "recur" ? "반복 종료일" : "종료일"}
+                          value={form.dateEnd}
+                          onChange={(e) => {
+                            const dateEnd = e.target.value;
+                            setForm((f) => {
+                              if (f.mode === "range" && dateEnd === f.dateStart) {
+                                return { ...f, mode: "single", dateEnd };
+                              }
+                              return {
+                                ...f,
+                                dateEnd: dateEnd < f.dateStart ? f.dateStart : dateEnd,
+                              };
+                            });
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+                {form.mode === "recur" && (
+                  <div className="date-field__recur">
+                    <span className="date-field__sub" id="weekday-label">
+                      반복 요일
+                    </span>
+                    <div
+                      className="weekday-picks"
+                      role="group"
+                      aria-labelledby="weekday-label"
+                    >
+                      {WEEKDAY_LABELS.map((label, day) => (
+                        <button
+                          key={day}
+                          type="button"
+                          data-day={day}
+                          aria-pressed={form.weekdays.includes(day)}
+                          onClick={() => toggleWeekday(day)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {form.mode !== "single" && summaryText && (
+                  <p className="date-field__summary" aria-live="polite">
+                    {summaryText}
+                  </p>
+                )}
+              </div>
+
               <div className="field">
                 <label htmlFor="todo-category">카테고리</label>
                 <input

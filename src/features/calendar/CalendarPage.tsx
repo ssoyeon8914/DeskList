@@ -5,7 +5,17 @@ import {
   weekHeaders,
 } from "../../domain/calendarGrid";
 import { allCategories, monthFilteredTodos } from "../../domain/filter";
-import type { WeekStartsOn } from "../../domain/types";
+import { parseDate } from "../../domain/calendarGrid";
+import { holidayOn } from "../../domain/holidays";
+import {
+  dateRangeLabel,
+  isRangeTodo,
+  isRecurTodo,
+  pushTodoOntoDates,
+  rangeSegment,
+  todoCoversDate,
+} from "../../domain/todoDates";
+import type { EnrichedTodo, WeekStartsOn } from "../../domain/types";
 import {
   resetFilters,
   setCalendar,
@@ -15,14 +25,64 @@ import {
 import { useAppStore } from "../../state/useStore";
 import { FilterGroup } from "../../ui/FilterGroup";
 
+function CalTask({
+  t,
+  iso,
+  cellIndex,
+  types,
+}: {
+  t: EnrichedTodo;
+  iso: string;
+  cellIndex: number;
+  types: { name: string; icon: string }[];
+}) {
+  if (isRangeTodo(t)) {
+    const seg = rangeSegment(t, iso);
+    if (!seg) return null;
+    const showTitle =
+      iso === t.dateStart ||
+      (cellIndex % 7 === 0 && todoCoversDate(t, iso));
+    return (
+      <div
+        className={`range-bar range-bar--${seg}${t.progress >= 100 ? " range-bar--done" : ""}`}
+        data-level={t.display}
+        title={`${dateRangeLabel(t)} · ${t.title}`}
+      >
+        {showTitle && (
+          <>
+            <span className="range-bar__icon">{iconFor(types, t.type)}</span>
+            <span className="range-bar__title">{t.title}</span>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`task${t.progress >= 100 ? " task--done" : ""}${
+        isRecurTodo(t) ? " task--recur" : ""
+      }`}
+    >
+      <span className="task__icon">{iconFor(types, t.type)}</span>
+      <span className="task__pri" data-level={t.display} />
+      <span className="task__title">
+        {isRecurTodo(t) ? "↻ " : ""}
+        {t.title}
+      </span>
+      <span className="task__bar">
+        <i style={{ width: `${t.progress}%` }} />
+      </span>
+    </div>
+  );
+}
+
 export function CalendarPage() {
   const state = useAppStore();
   const { calendar, weekStartsOn, filters, types } = state;
   const list = monthFilteredTodos(state);
-  const byDate: Record<string, typeof list> = {};
-  list.forEach((t) => {
-    (byDate[t.date] ||= []).push(t);
-  });
+  const byDate: Record<string, EnrichedTodo[]> = {};
+  list.forEach((t) => pushTodoOntoDates(t, byDate));
 
   const headers = weekHeaders(weekStartsOn);
   const cells = monthCells(calendar.year, calendar.month, weekStartsOn);
@@ -80,12 +140,17 @@ export function CalendarPage() {
             data-density={String(dens)}
             aria-label="월간 달력"
           >
-            {cells.map((cell) => {
+            {cells.map((cell, cellIndex) => {
               const items = byDate[cell.date] || [];
               const n = items.length;
+              const holiday = holidayOn(state.holidays, cell.date);
+              const dow = parseDate(cell.date).getDay();
               let dayCls = "day";
               if (!cell.inMonth) dayCls += " day--muted";
               if (cell.isToday) dayCls += " day--today";
+              if (dow === 0) dayCls += " day--sun";
+              if (dow === 6) dayCls += " day--sat";
+              if (holiday) dayCls += " day--holiday";
               if (n > 16) dayCls += " day--alert";
               else if (n > 8) dayCls += " day--warn";
 
@@ -108,18 +173,19 @@ export function CalendarPage() {
                     {cell.day}
                     {lamp}
                   </div>
+                  {holiday && (
+                    <span className="day__holiday" title={holiday.name}>
+                      {holiday.name}
+                    </span>
+                  )}
                   {shown.map((t) => (
-                    <div
+                    <CalTask
                       key={t.id}
-                      className={`task${t.progress >= 100 ? " task--done" : ""}`}
-                    >
-                      <span className="task__icon">{iconFor(types, t.type)}</span>
-                      <span className="task__pri" data-level={t.display} />
-                      <span className="task__title">{t.title}</span>
-                      <span className="task__bar">
-                        <i style={{ width: `${t.progress}%` }} />
-                      </span>
-                    </div>
+                      t={t}
+                      iso={cell.date}
+                      cellIndex={cellIndex}
+                      types={types}
+                    />
                   ))}
                   {n > dens && (
                     <div className="task-overflow">+{n - dens} 더보기</div>

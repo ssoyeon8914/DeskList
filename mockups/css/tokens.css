@@ -41,5 +41,12 @@
   --pri-high: #c44b3c;
   --pri-mid: var(--signal);
   --pri-low: oklch(55% 0.02 255);
+  --dow-sun: #c44b3c;
+  --dow-sat: #2563eb;
   --nav-h: 3.25rem;
+
+  --memo-cream: #f3eee4;
+  --memo-mint: #e3efe8;
+  --memo-sky: #e5eef5;
+  --memo-rose: #f2e9e7;
 }

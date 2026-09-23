@@ -66,6 +66,61 @@
     document.getElementById("dens-16").setAttribute("aria-pressed", c.density === 16 ? "true" : "false");
   }
 
+  function rangeTitleVisible(t, iso, cellIndex) {
+    if (!S.isRangeTodo(t)) return true;
+    if (iso === t.dateStart) return true;
+    if (cellIndex % 7 === 0 && S.todoCoversDate(t, iso)) return true;
+    return false;
+  }
+
+  function renderTask(t, iso, cellIndex) {
+    if (S.isRangeTodo(t)) {
+      var seg = S.rangeSegment(t, iso);
+      var showTitle = rangeTitleVisible(t, iso, cellIndex);
+      var done = t.progress >= 100 ? " range-bar--done" : "";
+      return (
+        '<div class="range-bar range-bar--' +
+        seg +
+        done +
+        '" data-level="' +
+        t.display +
+        '" title="' +
+        esc(S.dateRangeLabel(t) + " · " + t.title) +
+        '">' +
+        (showTitle
+          ? '<span class="range-bar__icon">' +
+            S.iconFor(t.type) +
+            '</span><span class="range-bar__title">' +
+            esc(t.title) +
+            "</span>"
+          : "") +
+        "</div>"
+      );
+    }
+    var doneChip = t.progress >= 100 ? " task--done" : "";
+    var recurCls = S.isRecurTodo(t) ? " task--recur" : "";
+    return (
+      '<div class="task' +
+      doneChip +
+      recurCls +
+      '">' +
+      '<span class="task__icon">' +
+      S.iconFor(t.type) +
+      "</span>" +
+      '<span class="task__pri" data-level="' +
+      t.display +
+      '"></span>' +
+      '<span class="task__title">' +
+      (S.isRecurTodo(t) ? "↻ " : "") +
+      esc(t.title) +
+      "</span>" +
+      '<span class="task__bar"><i style="width:' +
+      t.progress +
+      '%"></i></span>' +
+      "</div>"
+    );
+  }
+
   function renderGrid(state) {
     var c = state.calendar;
     var headers = S.weekHeaders(c.weekStartsOn);
@@ -78,7 +133,15 @@
     var list = S.monthFilteredTodos();
     var byDate = {};
     list.forEach(function (t) {
-      (byDate[t.date] || (byDate[t.date] = [])).push(t);
+      var d = S.parseDate(t.dateStart);
+      var end = S.parseDate(t.dateEnd);
+      while (d <= end) {
+        var iso = S.formatDate(d);
+        if (S.todoCoversDate(t, iso)) {
+          (byDate[iso] || (byDate[iso] = [])).push(t);
+        }
+        d.setDate(d.getDate() + 1);
+      }
     });
 
     var cells = S.monthCells(c.year, c.month, c.weekStartsOn);
@@ -87,7 +150,7 @@
     grid.dataset.density = String(dens);
 
     grid.innerHTML = cells
-      .map(function (cell) {
+      .map(function (cell, cellIndex) {
         var items = byDate[cell.date] || [];
         var n = items.length;
         var lamp = "";
@@ -102,30 +165,16 @@
           lamp = ' <span class="lamp lamp--yellow" title="8개 초과"></span>';
         }
 
+        var holiday = S.holidayOn(cell.date);
+        var dow = S.parseDate(cell.date).getDay();
+        if (dow === 0) dayCls += " day--sun";
+        if (dow === 6) dayCls += " day--sat";
+        if (holiday) dayCls += " day--holiday";
+
         var shown = items.slice(0, dens);
         var tasks = shown
-          .map(function (t, i) {
-            var extra = dens === 8 && i >= 8 ? " task-extra" : "";
-            var done = t.progress >= 100 ? " task--done" : "";
-            return (
-              '<div class="task' +
-              done +
-              extra +
-              '">' +
-              '<span class="task__icon">' +
-              S.iconFor(t.type) +
-              "</span>" +
-              '<span class="task__pri" data-level="' +
-              t.display +
-              '"></span>' +
-              '<span class="task__title">' +
-              esc(t.title) +
-              "</span>" +
-              '<span class="task__bar"><i style="width:' +
-              t.progress +
-              '%"></i></span>' +
-              "</div>"
-            );
+          .map(function (t) {
+            return renderTask(t, cell.date, cellIndex);
           })
           .join("");
 
@@ -144,6 +193,9 @@
           cell.day +
           lamp +
           "</div>" +
+          (holiday
+            ? '<span class="day__holiday" title="' + esc(holiday.name) + '">' + esc(holiday.name) + "</span>"
+            : "") +
           tasks +
           overflow +
           "</a>"

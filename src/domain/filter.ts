@@ -1,9 +1,10 @@
 import { enrich } from "./derive";
+import { todoCoversDate } from "./todoDates";
 import type { AppState, EnrichedTodo, Filters, Todo } from "./types";
 
 export function matchesFilters(todo: Todo, f: Filters): boolean {
   const e = enrich(todo);
-  if (f.dates.length && !f.dates.includes(todo.date)) return false;
+  if (f.dates.length && !f.dates.some((d) => todoCoversDate(todo, d))) return false;
   if (!f.types.includes(todo.type)) return false;
   if (!f.priorities.includes(todo.priority)) return false;
   if (!f.categories.includes(todo.category)) return false;

@@ -1,3 +1,6 @@
+import { seedHolidays } from "../domain/holidays";
+import { seedMemos } from "../domain/memos";
+import { seedDocs, seedDocsUi, seedFolders } from "../domain/notes";
 import type { AppState } from "../domain/types";
 
 export function seedMandala(): string[] {
@@ -16,7 +19,7 @@ export function seedMandala(): string[] {
 
 export function createSeed(): AppState {
   return {
-    version: 1,
+    version: 3,
     types: [
       { name: "일정", icon: "🗓️" },
       { name: "할일", icon: "✔️" },
@@ -42,25 +45,43 @@ export function createSeed(): AppState {
     },
     selectedId: null,
     todos: [
-      { id: "t1", type: "일정", date: "2026-09-16", category: "프로모션", priority: "높음", title: "10:00 신제품 프로모션 미팅", progress: 0, note: "회의실" },
-      { id: "t2", type: "할일", date: "2026-09-16", category: "프로모션", priority: "중간", title: "블로그 초안 작성", progress: 90, note: "" },
-      { id: "t3", type: "할일", date: "2026-09-16", category: "프로모션", priority: "낮음", title: "자료 정리", progress: 40, note: "" },
-      { id: "t4", type: "할일", date: "2026-09-16", category: "프로모션", priority: "중간", title: "카피 리뷰", progress: 10, note: "" },
-      { id: "t5", type: "회의", date: "2026-09-16", category: "프로모션", priority: "높음", title: "촬영 준비", progress: 0, note: "" },
-      { id: "t6", type: "할일", date: "2026-09-16", category: "프로모션", priority: "낮음", title: "키워드 조사", progress: 60, note: "" },
-      { id: "t7", type: "할일", date: "2026-09-16", category: "프로모션", priority: "중간", title: "썸네일 스케치", progress: 20, note: "" },
-      { id: "t8", type: "할일", date: "2026-09-16", category: "프로모션", priority: "낮음", title: "일정 공유", progress: 100, note: "" },
-      { id: "t9", type: "할일", date: "2026-09-16", category: "프로모션", priority: "중간", title: "댓글 답변", progress: 0, note: "" },
-      { id: "t10", type: "일정", date: "2026-09-16", category: "프로모션", priority: "낮음", title: "16:00 체크인", progress: 0, note: "" },
-      { id: "t11", type: "할일", date: "2026-09-17", category: "프로모션", priority: "낮음", title: "블로그 포스팅", progress: 50, note: "" },
-      { id: "t12", type: "할일", date: "2026-09-18", category: "프로모션", priority: "높음", title: "카드뉴스 기획", progress: 100, note: "" },
-      { id: "t13", type: "할일", date: "2026-09-19", category: "프로모션", priority: "중간", title: "카드뉴스 초안 작성", progress: 100, note: "" },
-      { id: "t14", type: "할일", date: "2026-09-20", category: "프로모션", priority: "낮음", title: "카드뉴스 포스팅", progress: 0, note: "" },
-      { id: "t15", type: "할일", date: "2026-09-21", category: "프로모션", priority: "높음", title: "이메일 뉴스레터 기획", progress: 25, note: "" },
-      { id: "t16", type: "할일", date: "2026-09-22", category: "프로모션", priority: "중간", title: "이메일 뉴스레터 초안 작성", progress: 0, note: "" },
-      { id: "t17", type: "할일", date: "2026-09-23", category: "프로모션", priority: "낮음", title: "이메일 뉴스레터 발행", progress: 0, note: "" },
-      { id: "t18", type: "일정", date: "2026-09-24", category: "프로모션", priority: "낮음", title: "11:00 미팅", progress: 100, note: "" },
+      { id: "t1", type: "일정", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "높음", title: "10:00 신제품 프로모션 미팅", progress: 0, note: "회의실" },
+      { id: "t2", type: "할일", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "중간", title: "블로그 초안 작성", progress: 90, note: "" },
+      { id: "t3", type: "할일", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "낮음", title: "자료 정리", progress: 40, note: "" },
+      { id: "t4", type: "할일", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "중간", title: "카피 리뷰", progress: 10, note: "" },
+      { id: "t5", type: "회의", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "높음", title: "촬영 준비", progress: 0, note: "" },
+      { id: "t6", type: "할일", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "낮음", title: "키워드 조사", progress: 60, note: "" },
+      { id: "t7", type: "할일", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "중간", title: "썸네일 스케치", progress: 20, note: "" },
+      { id: "t8", type: "할일", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "낮음", title: "일정 공유", progress: 100, note: "" },
+      { id: "t9", type: "할일", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "중간", title: "댓글 답변", progress: 0, note: "" },
+      { id: "t10", type: "일정", dateStart: "2026-09-16", dateEnd: "2026-09-16", category: "프로모션", priority: "낮음", title: "16:00 체크인", progress: 0, note: "" },
+      { id: "t11", type: "할일", dateStart: "2026-09-17", dateEnd: "2026-09-17", category: "프로모션", priority: "낮음", title: "블로그 포스팅", progress: 50, note: "" },
+      { id: "t12", type: "할일", dateStart: "2026-09-18", dateEnd: "2026-09-18", category: "프로모션", priority: "높음", title: "카드뉴스 기획", progress: 100, note: "" },
+      { id: "t13", type: "할일", dateStart: "2026-09-19", dateEnd: "2026-09-19", category: "프로모션", priority: "중간", title: "카드뉴스 초안 작성", progress: 100, note: "" },
+      { id: "t14", type: "할일", dateStart: "2026-09-20", dateEnd: "2026-09-20", category: "프로모션", priority: "낮음", title: "카드뉴스 포스팅", progress: 0, note: "" },
+      { id: "t15", type: "할일", dateStart: "2026-09-21", dateEnd: "2026-09-21", category: "프로모션", priority: "높음", title: "이메일 뉴스레터 기획", progress: 25, note: "" },
+      { id: "t16", type: "할일", dateStart: "2026-09-22", dateEnd: "2026-09-22", category: "프로모션", priority: "중간", title: "이메일 뉴스레터 초안 작성", progress: 0, note: "" },
+      { id: "t17", type: "할일", dateStart: "2026-09-23", dateEnd: "2026-09-23", category: "프로모션", priority: "낮음", title: "이메일 뉴스레터 발행", progress: 0, note: "" },
+      { id: "t18", type: "일정", dateStart: "2026-09-24", dateEnd: "2026-09-24", category: "프로모션", priority: "낮음", title: "11:00 미팅", progress: 100, note: "" },
+      { id: "t19", type: "일정", dateStart: "2026-09-15", dateEnd: "2026-09-18", category: "프로모션", priority: "높음", title: "프로모션 캠페인 기간", progress: 40, note: "기간 바 데모" },
+      {
+        id: "t20",
+        type: "회의",
+        dateStart: "2026-09-15",
+        dateEnd: "2026-10-10",
+        category: "프로모션",
+        priority: "중간",
+        title: "주간 스탠드업",
+        progress: 0,
+        note: "반복 데모 · 월·수·금",
+        recur: { freq: "weekly", weekdays: [1, 3, 5] },
+      },
     ],
+    holidays: seedHolidays(),
+    memos: seedMemos(),
+    docFolders: seedFolders(),
+    docs: seedDocs(),
+    docsUi: seedDocsUi(),
     mandala: seedMandala(),
   };
 }
