@@ -71,7 +71,8 @@ function noCachePlugin(): Plugin {
 export default defineConfig({
   plugins: [react(), noCachePlugin()],
   server: {
-    port: 5173,
+    port: 5174,
+    strictPort: true,
     headers: {
       "Cache-Control": NO_CACHE,
       Pragma: "no-cache",
@@ -79,6 +80,8 @@ export default defineConfig({
     },
   },
   preview: {
+    port: 5174,
+    strictPort: true,
     headers: {
       "Cache-Control": NO_CACHE,
       Pragma: "no-cache",

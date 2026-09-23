@@ -1,456 +1,129 @@
 <!DOCTYPE html>
-
-
-
 <html lang="ko">
-
-
-
   <head>
-
-
-
     <meta charset="utf-8" />
-
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-
     <meta http-equiv="Pragma" content="no-cache" />
-
     <meta http-equiv="Expires" content="0" />
-
-
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-
-
-    <title>?? � DeskList ??</title>
-
-
-
-    <link rel="stylesheet" href="css/mock.css?v=20260922a" />
-
-
-
+    <title>설정 · DeskList 목업</title>
+    <link rel="stylesheet" href="css/mock.css?v=20260923a" />
   </head>
-
-
-
   <body>
-
-
-
     <header class="site-header">
-
-
-
       <div class="site-header__inner">
-
-
-
         <a class="brand" href="index.html">Desk<span>List</span></a>
-
-
-
-        <nav class="nav" aria-label="??">
-
-
-
-          <a href="calendar.html">??</a>
-
-
-
-          <a href="todos.html">??</a>
-
-
-
-          <a href="mandalart.html">????</a>
-
-
-
+        <nav class="nav" aria-label="주요">
+          <a href="calendar.html">달력</a>
+          <a href="todos.html">할일</a>
+          <a href="mandalart.html">만다라트</a>
           <a href="memos.html">메모</a>
-
           <a href="notes.html">노트</a>
-
-          <a href="settings.html" aria-current="page">??</a>
-
-
-
+          <a href="settings.html" aria-current="page">설정</a>
         </nav>
-
-
-
       </div>
-
-
-
     </header>
 
-
-
-
-
-
-
     <main class="main">
-
-
-
       <div class="page-head">
-
-
-
         <div>
-
-
-
-          <h1>??</h1>
-
-
-
+          <h1>설정</h1>
           <p>
-
-
-
-            ??�??? ? ? ???? ?????.<br />
-
-
-
-            <span class="field-hint">???: localStorage</span>
-
-
-
+            구분·공휴일 등 앱 기본값을 관리합니다.<br />
+            <span class="field-hint">데이터: localStorage</span>
           </p>
-
-
-
         </div>
-
-
-
         <div id="settings-actions" class="settings-actions" style="display:flex;gap:0.5rem;flex-wrap:wrap">
-
-
-
-          <button type="button" class="btn btn--primary" id="add-type">?? ??</button>
-
-
-
+          <button type="button" class="btn btn--primary" id="add-type">구분 추가</button>
           <button type="button" class="btn" id="export-data">데이터 내보내기</button>
-
           <button type="button" class="btn" id="import-data">데이터 가져오기</button>
-
           <input type="file" id="import-data-file" accept="application/json,.json" hidden />
-
           <button type="button" class="btn btn--danger" id="reset-seed">할일 초기화</button>
-
-
-
         </div>
-
-
-
       </div>
 
-
-
-
-
-
-
       <div class="settings-shell">
-
-
-
-        <nav class="settings-nav" aria-label="?? ??">
-
-
-
-          <a href="settings.html?tab=types" data-tab="types" class="settings-nav__link">?? ??</a>
-
-
-
-          <a href="settings.html?tab=holidays" data-tab="holidays" class="settings-nav__link">??? ??</a>
-
-
-
+        <nav class="settings-nav" aria-label="설정 메뉴">
+          <a href="settings.html?tab=types" data-tab="types" class="settings-nav__link">구분 관리</a>
+          <a href="settings.html?tab=holidays" data-tab="holidays" class="settings-nav__link">공휴일 설정</a>
         </nav>
 
-
-
-
-
-
-
         <div class="settings-panels">
-
-
-
           <section class="settings-panel" id="panel-types" data-panel="types" hidden>
-
-
-
             <header class="settings-panel__head">
-
-
-
-              <h2>?? ??</h2>
-
-
-
-              <p>?? ? ??? ???. ?? ? ??�?? ???? ?????.</p>
-
-
-
+              <h2>구분 관리</h2>
+              <p>구분 ↔ 아이콘 마스터. 저장 시 할일·달력 아이콘에 반영됩니다.</p>
             </header>
 
-
-
             <p class="note" style="margin-top: 0">
-
-
-
-              ?? ? ????�?? ? ???? ? ??? ????.
-
-
-
+              할일 폼 드롭다운·달력 셀 아이콘은 이 목록을 읽습니다.
             </p>
-
-
 
             <div class="settings-rows" id="settings-rows"></div>
 
-
-
             <p class="hint-inline" style="margin-top: var(--space-4)">
-
-
-
-              ???? (?? ? ????):
-
-
-
-              <select aria-label="?? ????" id="preview-select"></select>
-
-
-
+              미리보기 (할일 폼 드롭다운):
+              <select aria-label="연동 미리보기" id="preview-select"></select>
             </p>
-
-
-
           </section>
-
-
-
-
-
-
 
           <section class="settings-panel" id="panel-holidays" data-panel="holidays" hidden>
-
-
-
             <header class="settings-panel__head">
-
-
-
               <div class="settings-panel__head-row">
-
-
-
                 <div>
-
-
-
-                  <h2>??? ??</h2>
-
-
-
-                  <p>??? ?? ??? ?????. ???? ?? ??, ??? ?? ?????.</p>
-
-
-
+                  <h2>공휴일 설정</h2>
+                  <p>연도별 공휴일을 관리합니다. 달력에 바로 반영됩니다.</p>
                 </div>
-
-
-
-                <button type="button" class="btn btn--primary" id="holiday-add-open">??? ??</button>
-
-
-
+                <button type="button" class="btn btn--primary" id="holiday-add-open">공휴일 추가</button>
               </div>
-
-
-
             </header>
 
-
-
-
-
-
-
-            <div class="holiday-toolbar" role="group" aria-label="?? ??">
-
-
-
+            <div class="holiday-toolbar" role="group" aria-label="연도 선택">
               <div class="holiday-year-nav">
-
-
-
-                <button type="button" class="btn btn--ghost" id="holiday-year-prev" aria-label="?? ?">?</button>
-
-
-
-                <select id="holiday-year-select" aria-label="??? ??"></select>
-
-
-
-                <button type="button" class="btn btn--ghost" id="holiday-year-next" aria-label="?? ?">?</button>
-
-
-
+                <button type="button" class="btn btn--ghost" id="holiday-year-prev" aria-label="이전 해">←</button>
+                <select id="holiday-year-select" aria-label="공휴일 연도"></select>
+                <button type="button" class="btn btn--ghost" id="holiday-year-next" aria-label="다음 해">→</button>
               </div>
-
-
-
               <p class="hint-inline" id="holiday-count" style="margin: 0"></p>
-
-
-
             </div>
 
+            <div class="holiday-year-board" id="holiday-year-board" aria-label="연간 공휴일 한눈에"></div>
 
-
-
-
-
-
-            <div class="holiday-year-board" id="holiday-year-board" aria-label="?? ??? ???"></div>
-
-
-
-
-
-
-
-            <section class="holiday-compose" id="holiday-compose" hidden aria-label="??? ??">
-
-
-
-              <h3 class="holiday-compose__title" id="holiday-compose-title">? ???</h3>
-
-
-
+            <section class="holiday-compose" id="holiday-compose" hidden aria-label="공휴일 입력">
+              <h3 class="holiday-compose__title" id="holiday-compose-title">새 공휴일</h3>
               <form id="holiday-form" class="holiday-form" action="#">
-
-
-
                 <div class="field">
-
-
-
-                  <label for="holiday-date">??</label>
-
-
-
+                  <label for="holiday-date">날짜</label>
                   <input id="holiday-date" type="date" required />
-
-
-
                 </div>
-
-
-
                 <div class="field holiday-form__name">
-
-
-
-                  <label for="holiday-name">??</label>
-
-
-
-                  <input id="holiday-name" type="text" placeholder="?: ??" required maxlength="40" autocomplete="off" />
-
-
-
+                  <label for="holiday-name">이름</label>
+                  <input
+                    id="holiday-name"
+                    type="text"
+                    placeholder="예: 추석"
+                    required
+                    maxlength="40"
+                    autocomplete="off"
+                  />
                 </div>
-
-
-
-                <button type="submit" class="btn btn--primary" id="holiday-submit">??</button>
-
-
-
-                <button type="button" class="btn" id="holiday-cancel">??</button>
-
-
-
+                <button type="submit" class="btn btn--primary" id="holiday-submit">추가</button>
+                <button type="button" class="btn" id="holiday-cancel">취소</button>
                 <input type="hidden" id="holiday-id" value="" />
-
-
-
               </form>
-
-
-
             </section>
 
-
-
-
-
-
-
-            <h3 class="holiday-detail__title">?? ??</h3>
-
-
-
+            <h3 class="holiday-detail__title">상세 목록</h3>
             <div class="holiday-list" id="holiday-rows"></div>
-
-
-
           </section>
-
-
-
         </div>
-
-
-
       </div>
-
-
-
     </main>
 
-
-
-    <script src="js/holiday-seed.js?v=20260922a"></script>
-
-
-
-    <script src="js/store.js?v=20260922a"></script>
-
-
-
-    <script src="js/modal.js?v=20260922a"></script>
-
-
-
-    <script src="js/settings-page.js?v=20260922a"></script>
-
-
-
-    <script src="js/holidays-page.js?v=20260922a"></script>
-
-
-
+    <script src="js/holiday-seed.js?v=20260923a"></script>
+    <script src="js/store.js?v=20260923a"></script>
+    <script src="js/modal.js?v=20260923a"></script>
+    <script src="js/settings-page.js?v=20260923a"></script>
+    <script src="js/holidays-page.js?v=20260923a"></script>
   </body>
-
-
-
 </html>
-
-
-
